@@ -23,8 +23,8 @@
 window.KATALOG_INFO = {
   judul: "Katalog Undangan Digital",
   subjudul: "Pilih model favorit Anda. Klik cover untuk membuka contoh undangan lengkap. Gunakan HP untuk tampilan terbaik.",
-  baseUrl: "https://ddarkan03-ux.github.io/GANTI-NAMA-REPO-KATALOG",   // alamat katalog ini (dari GitHub: Settings > Pages), tanpa garis miring di akhir
-  whatsapp: "",                                 // nomor WhatsApp Anda, contoh "6281234567890". Kosong = tombol Pesan disembunyikan
+  baseUrl: "https://ddarkan03-ux.github.io/DEMO-KATALOG",   // alamat katalog ini (dari GitHub: Settings > Pages), tanpa garis miring di akhir
+  whatsapp: "6285716300907",                                 // nomor WhatsApp Anda, contoh "6281234567890". Kosong = tombol Pesan disembunyikan
   pesanWA: "Halo, saya tertarik dengan undangan digital model {nama}. Boleh minta info lebih lanjut?",
   contohTamu: "Tamu Undangan"                   // nama tamu yang tampil di contoh undangan
 };
