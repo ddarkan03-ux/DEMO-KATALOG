@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light">
+<title>Katalog Undangan Digital</title>
+<meta name="description" content="Pilih model undangan digital favorit Anda.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Katalog Undangan Digital">
+<meta property="og:title" content="Katalog Undangan Digital">
+<meta property="og:description" content="Pilih model undangan digital favorit Anda.">
+<meta property="og:image" content="https://ddarkan03-ux.github.io/GANTI-NAMA-REPO-KATALOG/assets/img/og.jpg">
+<meta property="og:image:width" content="600">
+<meta property="og:image:height" content="600">
+<meta property="og:url" content="https://ddarkan03-ux.github.io/GANTI-NAMA-REPO-KATALOG/">
+<meta name="twitter:card" content="summary">
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:light;--bg:#F6F3EE;--ink:#4A3F38;--card:#fff;--acc:#8B6B58}
+body{margin:0;font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);padding:24px 16px}
+.top{max-width:1040px;margin:0 auto 20px}
+h1{font-size:1.6rem;margin:0 0 4px}.top p{margin:0;opacity:.8}
+.cnt{font-size:.85rem;opacity:.65;margin-top:6px!important}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;max-width:1040px;margin:0 auto}
+.c{background:var(--card);border-radius:16px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.pv{position:relative;width:100%;aspect-ratio:390/560;overflow:hidden;border-radius:12px;background:#ddd}
+.pv iframe,.pv img.cv{position:absolute;left:0;top:0;border:0;pointer-events:none;transform-origin:0 0}
+.pv img.cv{width:100%;height:100%;object-fit:cover}
+.pv iframe{width:390px;height:560px}
+.pv a.ov{position:absolute;inset:0;z-index:2}
+.tag{position:absolute;top:10px;left:10px;z-index:3;background:#d6336c;color:#fff;font:700 .7rem system-ui,sans-serif;letter-spacing:.05em;padding:3px 10px;border-radius:999px}
+.c b{display:block;margin-top:10px}
+.c small{display:block;opacity:.75;margin:2px 0 10px;min-height:2.9em}
+.b{display:inline-block;padding:8px 14px;border:0;border-radius:999px;background:var(--acc);color:#fff;font:600 .85rem system-ui,sans-serif;text-decoration:none;cursor:pointer;margin:2px 2px 0 0}
+.b.o{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.b.wa{background:#1f9d55}
+.kosong{max-width:1040px;margin:30px auto;text-align:center}
+</style></head><body>
+<div class="top"><h1 id="jd">Katalog Undangan Digital</h1>
+<p id="sj"></p><p class="cnt" id="cnt"></p></div>
+<div class="g" id="g"></div>
+<p class="kosong" id="kosong" hidden>Belum ada model. Tambahkan di assets/js/katalog-data.js</p>
+<script src="assets/js/katalog-data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var I = window.KATALOG_INFO || {}, K = window.KATALOG || [], g = document.getElementById('g');
+  document.getElementById('jd').textContent = I.judul || 'Katalog Undangan Digital';
+  document.title = I.judul || 'Katalog Undangan Digital';
+  document.getElementById('sj').textContent = I.subjudul || '';
+  document.getElementById('cnt').textContent = K.length ? K.length + ' model tersedia' : '';
+  if (!K.length) document.getElementById('kosong').hidden = false;
+  function el(t, c, x) { var n = document.createElement(t); if (c) n.className = c; if (x) n.textContent = x; return n; }
+  function demoUrl(k) {
+    try {
+      var u = new URL(k.demo, location.href);
+      if (!u.searchParams.has('to')) u.searchParams.set('to', I.contohTamu || 'Tamu Undangan');
+      return u.href;
+    } catch (e) { return k.demo || '#'; }
+  }
+  K.forEach(function (k) {
+    var url = demoUrl(k), card = el('div', 'c'), pv = el('div', 'pv'); pv.style.background = k.warna || '#ddd';
+    if (k.baru) pv.appendChild(el('span', 'tag', 'BARU'));
+    if (k.cover) { var im = el('img', 'cv'); im.src = k.cover; im.alt = k.nama; im.loading = 'lazy'; pv.appendChild(im); }
+    else { var f = el('iframe'); f.src = url; f.loading = 'lazy'; f.tabIndex = -1; f.title = 'Cover ' + k.nama; pv.appendChild(f); }
+    var ov = el('a', 'ov'); ov.href = url; ov.target = '_blank'; ov.rel = 'noopener'; ov.setAttribute('aria-label', 'Buka ' + k.nama); pv.appendChild(ov);
+    card.appendChild(pv); card.appendChild(el('b', '', k.nama)); card.appendChild(el('small', '', k.deskripsi || ''));
+    var a = el('a', 'b', 'Lihat contoh'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; card.appendChild(a);
+    var s = el('button', 'b o', 'Salin tautan'); s.type = 'button';
+    s.onclick = function () {
+      (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { s.textContent = 'Tersalin'; setTimeout(function () { s.textContent = 'Salin tautan'; }, 1500); }, function () { prompt('Salin tautan:', url); });
+    };
+    card.appendChild(s);
+    var nomor = String(I.whatsapp || '').replace(/\D/g, ''); if (nomor.indexOf('0') === 0) nomor = '62' + nomor.slice(1);
+    if (nomor) {
+      var w = el('a', 'b wa', 'Pesan model ini'); w.target = '_blank'; w.rel = 'noopener';
+      w.href = 'https://wa.me/' + nomor + '?text=' + encodeURIComponent(String(I.pesanWA || 'Halo, saya tertarik dengan model {nama}.').replace(/\{nama\}/g, k.nama));
+      card.appendChild(w);
+    }
+    g.appendChild(card);
+  });
+  function skala() {
+    [].forEach.call(document.querySelectorAll('.pv iframe'), function (f) {
+      f.style.transform = 'scale(' + (f.parentNode.clientWidth / 390) + ')';
+    });
+  }
+  window.addEventListener('resize', skala); skala(); setTimeout(skala, 300);
+})();
+</script></body></html>
