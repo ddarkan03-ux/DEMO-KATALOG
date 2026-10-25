@@ -1,0 +1,2 @@
+Letakkan file MP3 di folder ini (mis. lagu.mp3), lalu isi "musik": "musik/lagu.mp3" di data/data-undangan.js.
+Rekomendasi gaya musik: lihat REKOMENDASI-MUSIK.txt.
