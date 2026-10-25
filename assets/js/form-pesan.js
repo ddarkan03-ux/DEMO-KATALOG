@@ -19,6 +19,7 @@
     {t: 'Mempelai Wanita', f: ORG('wanita')},
     {t: 'Akad Nikah', f: ACARA('akad')},
     {t: 'Resepsi', opt: 'resepsiOn', f: ACARA('resepsi')},
+    {t: 'Turut Mengundang (opsional)', f: [{k: 'turut', l: 'Nama yang turut mengundang (satu nama per baris)', t: 'area', rows: 4, p: 'Contoh:\nKeluarga Besar Bpk. Ahmad\nBpk. H. Slamet & Ibu Siti'}]},
     {t: 'Foto', foto: 1},
     {t: 'Hadiah / Rekening (opsional)', rek: 1},
     {t: 'Tambahan (opsional)', f: [{k: 'musik', l: 'Lagu latar (judul / link)', t: 'text'}, {k: 'catatan', l: 'Catatan untuk kami', t: 'area'}]}
@@ -108,7 +109,7 @@
   /* ---------- tampilan form ---------- */
   function field(f) {
     var w = el('div', 'pf'), lb = el('label', 'pl', f.l + (f.r ? ' *' : '')), i = f.t === 'area' ? el('textarea') : el('input');
-    w.id = 'f-' + f.k.replace('.', '-'); if (f.t !== 'area') i.type = f.t; else i.rows = 2;
+    w.id = 'f-' + f.k.replace('.', '-'); if (f.t !== 'area') i.type = f.t; else i.rows = f.rows || 2; if (f.p) i.placeholder = f.p;
     if (f.t === 'tel') i.inputMode = 'tel'; i.value = S[f.k] || '';
     i.oninput = function () { S[f.k] = i.value; w.classList.remove('err'); };
     w.appendChild(lb); w.appendChild(i); return w;
@@ -150,6 +151,7 @@
     bd.appendChild(el('p', 'pn', 'Periksa ringkasan ini. Klik Preview untuk melihat hasilnya, Edit untuk mengubah data, atau Kirim bila sudah benar.'));
     var rows = [['Pemesan', v('pemesan') + ' (' + v('wa') + ')'], ['Model', K.nama], ['Mempelai pria', v('pria.nama') + ' (' + v('pria.panggilan') + ')'], ['Mempelai wanita', v('wanita.nama') + ' (' + v('wanita.panggilan') + ')'], ['Akad', tgl(v('akad.tanggal')) + ', ' + jam('akad') + ' - ' + v('akad.tempat')]];
     if (S.resepsiOn) rows.push(['Resepsi', tgl(v('resepsi.tanggal')) + ', ' + jam('resepsi') + ' - ' + v('resepsi.tempat')]);
+    if (turut().length) rows.push(['Turut mengundang', turut().length + ' nama']);
     rows.push(['Foto', 1 * !!P.cover + 1 * !!P.pria + 1 * !!P.wanita + P.galeri.length + ' file']);
     var c = el('div', 'ps'); rows.forEach(function (r) { var d = el('div', 'rw'); d.appendChild(el('b', '', r[0])); d.appendChild(el('span', '', r[1])); c.appendChild(d); }); bd.appendChild(c);
     var a = el('div', 'acts3');
@@ -174,6 +176,7 @@
       if (a[0] === 'resepsi' && !S.resepsiOn) return;
       var d = el('div', 'ev'); d.appendChild(el('h4', '', a[1])); d.appendChild(el('p', '', tgl(v(a[0] + '.tanggal')) + '\n' + jam(a[0]))); d.appendChild(el('b', '', v(a[0] + '.tempat'))); d.appendChild(el('p', '', v(a[0] + '.alamat'))); if (v(a[0] + '.maps')) d.appendChild(el('span', 'mp', 'Lihat Lokasi')); iv.appendChild(d);
     });
+    if (turut().length) { var tu = el('div', 'ev'); tu.appendChild(el('h4', '', 'Turut Mengundang')); tu.appendChild(el('p', '', turut().join('\n'))); iv.appendChild(tu); }
     if (P.galeri.length) { var gl = el('div', 'gl'); P.galeri.forEach(function (p) { var im = el('img'); im.src = p.url; gl.appendChild(im); }); iv.appendChild(gl); }
     ['rek1', 'rek2'].forEach(function (p) { if (!v(p + '.bank')) return; var d = el('div', 'ev'); d.appendChild(el('h4', '', 'Hadiah - ' + bn(p))); d.appendChild(el('b', '', v(p + '.no'))); d.appendChild(el('p', '', 'a.n. ' + v(p + '.an'))); iv.appendChild(d); });
     iv.appendChild(el('p', 'ivf', 'Terima kasih atas doa dan restu Anda.')); bd.appendChild(iv);
@@ -182,14 +185,16 @@
 
   /* ---------- data, ZIP, WhatsApp ---------- */
   function acara(p) { return {tanggal: v(p + '.tanggal'), tanggalLengkap: tgl(v(p + '.tanggal')), jamMulai: v(p + '.jam'), jamSelesai: v(p + '.selesai'), tempat: v(p + '.tempat'), alamat: v(p + '.alamat'), maps: v(p + '.maps')}; }
+  function turut() { return v('turut').split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean); }
   function dataObj() {
     function org(p) { return {nama: v(p + '.nama'), panggilan: v(p + '.panggilan'), ayah: v(p + '.ayah'), ibu: v(p + '.ibu'), foto: P[p] ? 'foto/' + FNAME[p] : ''}; }
     var rek = []; ['rek1', 'rek2'].forEach(function (p) { if (v(p + '.bank')) rek.push({bank: bn(p), nomor: v(p + '.no'), atasNama: v(p + '.an')}); });
-    return {model: K.nama, pemesan: {nama: v('pemesan'), whatsapp: v('wa')}, cover: P.cover ? 'foto/cover.jpg' : '', mempelai: {pria: org('pria'), wanita: org('wanita')}, akad: acara('akad'), resepsi: S.resepsiOn ? acara('resepsi') : null, galeri: P.galeri.map(function (_, i) { return 'foto/galeri-' + (i + 1) + '.jpg'; }), hadiah: rek, musik: v('musik'), catatan: v('catatan')};
+    return {model: K.nama, pemesan: {nama: v('pemesan'), whatsapp: v('wa')}, cover: P.cover ? 'foto/cover.jpg' : '', mempelai: {pria: org('pria'), wanita: org('wanita')}, akad: acara('akad'), resepsi: S.resepsiOn ? acara('resepsi') : null, galeri: P.galeri.map(function (_, i) { return 'foto/galeri-' + (i + 1) + '.jpg'; }), hadiah: rek, turutMengundang: turut(), musik: v('musik'), catatan: v('catatan')};
   }
   function teks(d) {
     var L = ['DATA UNDANGAN DIGITAL', 'Model: ' + d.model, 'Pemesan: ' + d.pemesan.nama + ' (' + d.pemesan.whatsapp + ')', '', 'MEMPELAI PRIA', d.mempelai.pria.nama + ' (' + d.mempelai.pria.panggilan + ')', 'Putra dari Bpk. ' + d.mempelai.pria.ayah + ' & Ibu ' + d.mempelai.pria.ibu, '', 'MEMPELAI WANITA', d.mempelai.wanita.nama + ' (' + d.mempelai.wanita.panggilan + ')', 'Putri dari Bpk. ' + d.mempelai.wanita.ayah + ' & Ibu ' + d.mempelai.wanita.ibu];
     [['AKAD NIKAH', d.akad], ['RESEPSI', d.resepsi]].forEach(function (a) { if (!a[1]) return; L.push('', a[0], a[1].tanggalLengkap + ', ' + a[1].jamMulai + (a[1].jamSelesai ? ' - ' + a[1].jamSelesai : ' - selesai') + ' WIB', a[1].tempat, a[1].alamat); if (a[1].maps) L.push('Maps: ' + a[1].maps); });
+    if (d.turutMengundang.length) { L.push('', 'TURUT MENGUNDANG'); d.turutMengundang.forEach(function (n) { L.push('- ' + n); }); }
     if (d.hadiah.length) { L.push('', 'REKENING HADIAH'); d.hadiah.forEach(function (r) { L.push(r.bank + ' ' + r.nomor + ' a.n. ' + r.atasNama); }); }
     if (d.musik) L.push('', 'LAGU LATAR: ' + d.musik); if (d.catatan) L.push('', 'CATATAN: ' + d.catatan);
     return L.join('\r\n');
@@ -234,8 +239,6 @@
     c.appendChild(el('p', 'pn', 'Langkah 1: ZIP otomatis terunduh. Jika belum, tekan Unduh ZIP.'));
     c.appendChild(el('p', 'pn', 'Langkah 2: tekan Buka WhatsApp, klik ikon klip / lampiran di chat, pilih file ZIP dari folder Unduhan, lalu kirim.')); bd.appendChild(c);
     var a = el('div', 'acts3'); a.appendChild(ib('', 'down', 'Unduh ZIP', unduh)); a.appendChild(ib('wa', 'send', 'Buka WhatsApp', function () { window.open(waLink(), '_blank'); }));
-    var zf = window.File ? new File([lastZip], lastName + '.zip', {type: 'application/zip'}) : null;
-    if (zf && navigator.canShare && navigator.canShare({files: [zf]})) a.appendChild(ib('', 'send', 'Bagikan', function () { navigator.share({files: [zf], title: 'Data undangan'}).catch(function () {}); }));
     ft.appendChild(a);
   }
 

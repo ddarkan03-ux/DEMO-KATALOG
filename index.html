@@ -63,7 +63,7 @@ h1{font-size:1.6rem;margin:0 0 4px}.top p{margin:0;opacity:.8}
     eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
     link: '<svg viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>',
     ok: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-    chat: '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 20.5l1.5-5.4A8.5 8.5 0 1 1 21 11.5z"/></svg>'
+    chat: '<svg viewBox="0 0 24 24"><path d="M12 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6l5 5v2"/><path d="M13 3v5h5"/><path d="M8.5 11.5h4M8.5 15h2.5"/><path d="M22 13l-9 3.5 3.6 1.4 1.4 3.6z"/><path d="M16.6 17.9L22 13"/></svg>'
   };
   function el(t, c, x) { var n = document.createElement(t); if (c) n.className = c; if (x) n.textContent = x; return n; }
   function demoUrl(k) {
@@ -89,7 +89,7 @@ h1{font-size:1.6rem;margin:0 0 4px}.top p{margin:0;opacity:.8}
     acts.appendChild(s);
     var nomor = String(I.whatsapp || '').replace(/\D/g, ''); if (nomor.indexOf('0') === 0) nomor = '62' + nomor.slice(1);
     if (nomor) {
-      var w = el('a', 'ib wa'); w.target = '_blank'; w.rel = 'noopener'; w.title = 'Pesan model ini'; w.setAttribute('aria-label', 'Pesan ' + k.nama); w.innerHTML = IC.chat;
+      var w = el('a', 'ib wa'); w.target = '_blank'; w.rel = 'noopener'; w.title = 'Isi data & kirim pesanan'; w.setAttribute('aria-label', 'Isi data & kirim pesanan ' + k.nama); w.innerHTML = IC.chat;
       w.onclick = function (e) { if (window.PesanForm) { e.preventDefault(); window.PesanForm.buka(k); } };
       w.href = 'https://wa.me/' + nomor + '?text=' + encodeURIComponent(String(I.pesanWA || 'Halo, saya tertarik dengan model {nama}.').replace(/\{nama\}/g, k.nama));
       acts.appendChild(w);
