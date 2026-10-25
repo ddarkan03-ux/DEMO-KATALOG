@@ -1,0 +1,322 @@
+=====================================================================
+ PETUNJUK LENGKAP - KATALOG UNDANGAN DIGITAL
+ (Pernikahan & Khitan, dengan formulir pemesanan klien)
+=====================================================================
+
+DAFTAR ISI
+  1. Isi folder
+  2. Pertama kali memasang di GitHub
+  3. Mengisi pengaturan katalog (katalog-data.js)
+  4. Menambah model baru (pernikahan / khitan)
+  5. Mengubah atau menghapus model
+  6. Menu Pernikahan / Khitan
+  7. Alur klien memesan (formulir)
+  8. Isi file ZIP dari klien dan cara memakainya di VS Code
+  9. Rekening: aturan jumlah digit
+ 10. Mengubah isian formulir (lanjutan)
+ 11. Batasan yang perlu Anda tahu
+ 12. Pemecahan masalah
+ 13. Teks petunjuk untuk dikirim ke klien
+
+
+---------------------------------------------------------------------
+1. ISI FOLDER
+---------------------------------------------------------------------
+  index.html                   Halaman katalog + menu. Jarang diubah.
+  assets/js/katalog-data.js    DATA katalog. File yang rutin Anda edit.
+  assets/js/form-pesan.js      Formulir pemesanan, preview, pembuat ZIP.
+                               Jarang diubah (lihat bagian 10).
+  assets/img/og.jpg            Foto kartu pratinjau WhatsApp (600x600).
+  assets/img/katalog/          Tempat gambar cover opsional.
+  tools/terapkan-meta.js       Memperbarui meta tag index.html otomatis.
+
+PENTING: index.html memanggil dua file JavaScript di atas. Jika salah
+satu tidak terupload, katalog kosong atau tombol pesan tidak berfungsi.
+
+
+---------------------------------------------------------------------
+2. PERTAMA KALI MEMASANG DI GITHUB (sekali saja)
+---------------------------------------------------------------------
+  1. Buka github.com > tombol "New" untuk membuat repo baru,
+     mis. nama "katalog-undangan". Pilih Public.
+  2. Klik "uploading an existing file". Seret ISI folder ini:
+     index.html, folder assets, folder tools.
+     Jangan seret folder "KATALOG-DEMO" itu sendiri. Kalau foldernya
+     ikut terupload, alamat katalog akan "Not Found".
+     Pastikan assets/js/form-pesan.js ikut terupload.
+  3. Klik "Commit changes".
+  4. Aktifkan situs: Settings > Pages > Source "Deploy from a branch",
+     Branch "main", folder "/ (root)" > Save. Tunggu 1-2 menit.
+  5. Alamat katalog muncul di halaman Pages tersebut, bentuknya:
+     https://NAMAANDA.github.io/NAMA-REPO/
+  6. Isi katalog-data.js (bagian 3), lalu upload ulang file itu.
+  7. (Opsional) Agar kartu pratinjau WhatsApp benar, di VS Code buka
+     terminal di folder proyek dan jalankan:
+         node tools/terapkan-meta.js
+     lalu upload ulang index.html. Ulangi bila baseUrl/judul berubah.
+
+
+---------------------------------------------------------------------
+3. MENGISI PENGATURAN KATALOG (assets/js/katalog-data.js)
+---------------------------------------------------------------------
+  Bagian atas file = KATALOG_INFO:
+    judul      Judul di halaman katalog.
+    subjudul   Kalimat di bawah judul.
+    baseUrl    Alamat katalog dari Settings > Pages, tanpa garis miring
+               di akhir.
+    whatsapp   Nomor WhatsApp Anda, format 62, contoh "6281234567890".
+               Nomor inilah yang menerima pesanan klien.
+               Kosong = tombol pesan (ikon formulir) disembunyikan.
+    pesanWA    Tidak dipakai lagi oleh formulir, boleh dibiarkan.
+    contohTamu Nama tamu yang tampil di contoh undangan.
+
+
+---------------------------------------------------------------------
+4. MENAMBAH MODEL BARU
+---------------------------------------------------------------------
+  1. Upload undangan versi baru ke repo-nya sendiri dan pastikan
+     alamatnya bisa dibuka (cek di browser).
+  2. Buka assets/js/katalog-data.js. Di daftar KATALOG, salin satu
+     blok { ... } lalu tempel di bawahnya.
+  3. Ubah isinya:
+       kategori   "pernikahan" atau "khitan"
+                  Menentukan model tampil di menu mana dan formulir
+                  mana yang dipakai klien.
+       nama       Nama model yang tampil.
+       deskripsi  Keterangan singkat.
+       warna      Warna cadangan sebelum pratinjau termuat. Warna ini
+                  juga dipakai sebagai warna dasar PREVIEW klien.
+       demo       Alamat undangan contoh (wajib).
+       cover      Kosong = pratinjau langsung. Isi dengan gambar,
+                  mis. "assets/img/katalog/versi-8.jpg", agar lebih
+                  ringan.
+       baru       true = tampil label BARU (hapus bila sudah lama).
+  4. Aturan koma: setiap blok diakhiri koma, KECUALI blok terakhir.
+     Salah koma membuat katalog kosong.
+  5. Simpan, upload katalog-data.js ke folder assets/js di GitHub >
+     Commit. Tunggu 1-2 menit, buka katalog dengan Ctrl+F5.
+
+  CONTOH MODEL KHITAN
+  Di bagian bawah katalog-data.js ada contoh baris yang diberi tanda //.
+  Hapus tanda // di awal baris, ubah isinya, dan pastikan blok
+  sebelumnya diakhiri koma. Contoh hasil akhir:
+
+    { kategori: "khitan", nama: "Khitan 1 - Biru Ceria",
+      deskripsi: "Biru langit, balon, dan bintang",
+      warna: "#2B6CB0",
+      demo: "https://NAMAANDA.github.io/NAMA-REPO/khitan-1.html",
+      cover: "" }
+
+
+---------------------------------------------------------------------
+5. MENGUBAH ATAU MENGHAPUS MODEL
+---------------------------------------------------------------------
+  Ubah: edit nilainya di blok model, upload katalog-data.js lagi.
+  Hapus / sembunyikan: hapus blok model dari daftar KATALOG, upload lagi.
+  Pindah menu: ganti nilai kategori ("pernikahan" <-> "khitan").
+
+
+---------------------------------------------------------------------
+6. MENU PERNIKAHAN / KHITAN
+---------------------------------------------------------------------
+  - Di bawah judul ada dua tombol: Pernikahan dan Khitan, lengkap
+    dengan jumlah model di tiap menu.
+  - Menu Khitan yang belum punya model menampilkan kartu "segera
+    hadir" dengan tombol "Isi data undangan khitan". Klien tetap bisa
+    mengisi data, dan desain dipilih bersama Anda lewat WhatsApp.
+  - Alamat katalog bisa dibuka langsung di menu Khitan dengan menambah
+    #khitan di akhir alamat, contoh:
+        https://NAMAANDA.github.io/NAMA-REPO/#khitan
+    Berguna untuk dibagikan ke calon klien khitan.
+  - Efek gerak dimatikan otomatis di HP yang memakai pengaturan
+    "kurangi gerakan".
+
+
+---------------------------------------------------------------------
+7. ALUR KLIEN MEMESAN (FORMULIR)
+---------------------------------------------------------------------
+  1. Klien memilih model, lalu menekan ikon formulir dengan pesawat
+     kertas ("Isi data & kirim pesanan").
+  2. Formulir terbuka. Isian bertanda * wajib.
+       PERNIKAHAN: data pemesan, mempelai pria, mempelai wanita,
+         akad, resepsi (bisa dimatikan), turut mengundang, foto,
+         rekening hadiah, lagu dan catatan.
+       KHITAN: data pemesan, putra yang dikhitan (nama, panggilan,
+         putra ke-, ayah, ibu), acara khitanan, syukuran (opsional),
+         turut mengundang, foto, rekening, lagu dan catatan.
+  3. Foto: saat dipilih tampil animasi proses (kotak berkilau, bar
+     "Mengunggah foto... n / total", lalu centang "foto siap").
+     Foto otomatis diperkecil (maks. 1600 px) agar ZIP ringan.
+     Galeri maksimal 8 foto. Cover wajib. Tombol Lanjut menunggu
+     sampai semua foto selesai diproses.
+  4. Klien menekan "Lanjut". Jika ada data wajib kosong atau salah,
+     kolom ditandai merah dan layar menggulir ke sana.
+  5. Layar ringkasan menampilkan tiga tombol:
+       Preview  melihat hasil undangan dari data & foto klien.
+       Edit     kembali ke formulir (data tetap ada).
+       Kirim    membuat file ZIP dan mengunduhnya.
+  6. Layar terakhir: ZIP otomatis terunduh. Klien menekan "Buka
+     WhatsApp" (chat ke nomor Anda dengan pesan siap kirim), menekan
+     ikon klip / lampiran, memilih file ZIP dari folder Unduhan, lalu
+     mengirim.
+
+  Data formulir hanya tersimpan selama halaman belum ditutup atau
+  dimuat ulang. Jika klien menutup halaman, ia harus mengisi lagi.
+
+  CATATAN: WhatsApp tidak bisa melampirkan file otomatis dari web.
+  Karena itu klien harus melampirkan ZIP sendiri (langkah 6).
+
+
+---------------------------------------------------------------------
+8. ISI FILE ZIP DARI KLIEN DAN CARA MEMAKAINYA DI VS CODE
+---------------------------------------------------------------------
+  Nama file: undangan-NAMAPRIA-NAMAWANITA.zip
+             (khitan: undangan-khitan-NAMAPUTRA.zip)
+
+  Isi (setelah diekstrak):
+    undangan-andi-sinta/
+      foto/
+        cover.jpg
+        mempelai-pria.jpg      (khitan: foto-putra.jpg)
+        mempelai-wanita.jpg
+        galeri-1.jpg, galeri-2.jpg, ...
+      data/
+        data-undangan.js       Data lengkap, siap disalin ke VS Code.
+        data-klien.txt         Versi mudah dibaca (untuk Anda cek).
+
+  Cara memakai:
+    1. Ekstrak ZIP. Buka data-klien.txt untuk membaca pesanan.
+    2. Salin folder "foto" ke proyek undangan di VS Code (mis. ke
+       assets/foto/ atau sesuai template Anda).
+    3. Buka data/data-undangan.js. Isinya berupa:
+           const DATA_UNDANGAN = { ... };
+       Salin ke file data template undangan Anda.
+    4. Nama properti di data-undangan.js bersifat umum
+       (mempelai, akad, resepsi, hadiah, turutMengundang, dst).
+       Sesuaikan dengan nama di template Anda. Jalur foto di dalamnya
+       berbentuk "foto/cover.jpg"; ubah awalan jalur bila folder
+       foto Anda berada di tempat lain.
+    5. Di VS Code, rapikan dengan Shift+Alt+F (Windows) bila perlu.
+
+  Untuk khitan, kunci data utamanya: putra, khitan, syukuran
+  (pengganti mempelai, akad, resepsi).
+
+
+---------------------------------------------------------------------
+9. REKENING: ATURAN JUMLAH DIGIT
+---------------------------------------------------------------------
+  Klien memilih bank dari daftar. Kolom nomor hanya menerima angka,
+  berhenti di batas digit, dan menampilkan penghitung, mis. "7 / 10
+  digit". Data tidak bisa dilanjutkan jika jumlah digit salah.
+
+  Jumlah digit bawaan:
+    BCA 10 | BRI 15 | Mandiri 13 | BNI 10 | BSI 10 | BTN 16
+    CIMB Niaga 13 | Danamon 10 | OCBC 12 | Muamalat 10 | Permata 10
+    DANA, OVO, GoPay, ShopeePay: nomor HP 10-13 digit
+    Bank lainnya: 5-20 digit (klien mengetik nama bank)
+
+  Catatan: angka Permata dan e-wallet belum diverifikasi resmi, dan
+  bank bisa berubah aturan. Cek ulang bila perlu.
+
+  Mengubah daftar bank: buka assets/js/form-pesan.js, cari baris
+  "var BANK = [". Tiap entri berbentuk ['NamaBank', [jumlahDigit]].
+  Contoh menambah bank: ['Bank Jago', [12]]
+  Jika ada dua kemungkinan digit: ['CIMB Niaga', [12, 13]]
+  Setelah diubah, upload ulang form-pesan.js.
+
+
+---------------------------------------------------------------------
+10. MENGUBAH ISIAN FORMULIR (LANJUTAN)
+---------------------------------------------------------------------
+  Semua isian ada di assets/js/form-pesan.js:
+    SECT_NIKAH    daftar bagian formulir pernikahan
+    SECT_KHITAN   daftar bagian formulir khitan
+  Setiap isian berbentuk: {k: 'kode', l: 'Label', t: 'jenis', r: 1}
+    t  : text, tel, date, time, url, area (kotak teks besar)
+    r:1: wajib diisi
+  Menambah isian baru perlu juga ditambahkan ke fungsi dataObj() dan
+  teks() agar ikut masuk ke ZIP. Jika tidak yakin, minta bantuan
+  sebelum mengubahnya, karena salah ketik bisa membuat formulir
+  tidak muncul. Selalu simpan salinan file lama sebelum mengedit.
+
+
+---------------------------------------------------------------------
+11. BATASAN YANG PERLU ANDA TAHU
+---------------------------------------------------------------------
+  - PREVIEW adalah pratinjau sederhana dengan warna model, bukan
+    tampilan asli desain undangan. Gunanya agar klien mengecek data
+    dan foto. Tampilan akhir mengikuti desain model yang dipilih.
+  - ZIP tidak bisa otomatis masuk ke chat WhatsApp (batasan WhatsApp).
+  - Data klien tidak tersimpan di server. Semua diproses di HP/laptop
+    klien dan baru sampai ke Anda saat klien mengirim ZIP.
+  - Katalog ini sengaja noindex (tidak muncul di Google). Hapus baris
+    <meta name="robots"> di index.html bila ingin dicari lewat Google.
+  - Alamat demo tiap model harus online agar kartu dan tombol
+    "lihat contoh" tidak Not Found.
+
+
+---------------------------------------------------------------------
+12. PEMECAHAN MASALAH
+---------------------------------------------------------------------
+  Halaman katalog "Not Found" (404)
+    - Folder KATALOG-DEMO ikut terupload. Upload ISI-nya saja agar
+      index.html berada di paling atas repo.
+    - GitHub Pages belum aktif (Settings > Pages) atau belum 1-2 menit.
+    - Nama repo di alamat salah / beda huruf besar-kecil.
+
+  Kartu tampil tetapi isi contoh undangan "Not Found"
+    Alamat di kolom demo salah atau file undangan belum diupload.
+    Buka alamat itu langsung di browser untuk mengecek.
+
+  Katalog kosong sama sekali
+    Biasanya salah koma di katalog-data.js (lihat bagian 4), atau
+    file itu tidak ikut terupload.
+
+  Ikon formulir tidak muncul di kartu
+    Kolom whatsapp di KATALOG_INFO kosong.
+
+  Menekan ikon formulir hanya membuka WhatsApp, bukan formulir
+    File assets/js/form-pesan.js belum terupload atau namanya salah.
+
+  Perubahan tidak terlihat setelah upload
+    Tunggu 1-2 menit lalu tekan Ctrl+F5 (di HP: tutup tab dan buka
+    lagi). Pastikan file masuk ke folder yang benar.
+
+  Foto "tidak bisa dibaca"
+    Pakai foto JPG/PNG biasa. Foto format khusus (mis. HEIC dari
+    beberapa perangkat) kadang gagal; minta klien memotret ulang atau
+    mengirim sebagai JPG.
+
+  ZIP tidak terunduh
+    Tekan tombol "Unduh ZIP" di layar terakhir. Jika browser
+    memblokir unduhan, izinkan unduhan untuk situs ini. Jika masih
+    gagal, kirim screenshot pesan error-nya.
+
+  WhatsApp tidak terbuka
+    Tekan tombol "Buka WhatsApp" di layar terakhir. Di laptop,
+    pastikan WhatsApp Web / aplikasi desktop dapat dibuka dari
+    jaringan tersebut.
+
+  Nomor rekening ditolak padahal benar
+    Bank mungkin memakai jumlah digit lain. Ubah daftar BANK
+    (bagian 9) atau minta klien memilih "Bank lainnya".
+
+
+---------------------------------------------------------------------
+13. TEKS PETUNJUK UNTUK DIKIRIM KE KLIEN (salin ke WhatsApp)
+---------------------------------------------------------------------
+  Halo Kak, berikut cara memesan undangan digital:
+
+  1. Buka katalog: (tempel alamat katalog Anda)
+  2. Pilih menu Pernikahan atau Khitan, lalu pilih model favorit.
+  3. Tekan ikon formulir (ikon kertas dengan pesawat kertas) pada
+     model tersebut.
+  4. Isi semua data bertanda *, unggah foto (cover wajib), lalu
+     tekan Lanjut.
+  5. Tekan Preview untuk melihat hasilnya. Jika ada yang salah,
+     tekan Edit.
+  6. Jika sudah benar, tekan Kirim. File ZIP akan terunduh.
+  7. Tekan Buka WhatsApp, lalu klik ikon klip, pilih file ZIP dari
+     folder Unduhan, dan kirim ke kami.
+
+  Terima kasih. Kami akan segera memproses undangan Kakak.
