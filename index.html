@@ -43,10 +43,31 @@ h1{font-size:1.6rem;margin:0 0 4px}.top p{margin:0;opacity:.8}
 .ib:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .ib svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 .kosong{max-width:1040px;margin:30px auto;text-align:center}
+
+.tabs{position:relative;display:flex;gap:6px;max-width:440px;margin:18px 0 0;padding:5px;background:#EAE3DA;border-radius:999px}
+.tabs .ind{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 8px);border-radius:999px;background:linear-gradient(135deg,#8B6B58,#B08968);box-shadow:0 6px 16px rgba(139,107,88,.35);transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.tabs .ind.k2{transform:translateX(calc(100% + 6px))}
+.tabs button{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;gap:7px;height:46px;border:0;background:transparent;border-radius:999px;font:600 .92rem system-ui,sans-serif;color:var(--acc);cursor:pointer;transition:color .3s}
+.tabs button.on{color:#fff}.tabs button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.tabs svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tabs button.on svg{animation:wob .65s ease}
+.tabs em{font:600 .7rem system-ui,sans-serif;font-style:normal;background:rgba(0,0,0,.08);padding:1px 7px;border-radius:99px;transition:background .3s}.tabs button.on em{background:rgba(255,255,255,.25)}
+.spk{position:absolute;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:3}
+.c[hidden],.empty[hidden]{display:none}
+.c.in{animation:cin .55s cubic-bezier(.2,.8,.2,1) both}
+.empty{max-width:420px;margin:30px auto;padding:30px 22px;text-align:center;background:var(--card);border-radius:20px;box-shadow:0 4px 16px rgba(74,63,56,.08);animation:cin .55s cubic-bezier(.2,.8,.2,1) both}
+.empty svg{width:56px;height:56px;fill:none;stroke:var(--acc);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;animation:flt 3s ease-in-out infinite}
+.empty h3{margin:10px 0 4px}.empty p{margin:0 0 16px;opacity:.75;font-size:.9rem}
+@keyframes cin{from{opacity:0;transform:translateY(26px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes wob{0%{transform:scale(1) rotate(0)}40%{transform:scale(1.4) rotate(-16deg)}70%{transform:scale(.95) rotate(8deg)}100%{transform:scale(1)}}
+@keyframes flt{50%{transform:translateY(-8px) rotate(4deg)}}
+@media(prefers-reduced-motion:reduce){.c.in,.empty,.tabs .ind,.tabs button.on svg,.empty svg{animation:none!important;transition:none!important}}
 </style></head><body>
 <div class="top"><h1 id="jd">Katalog Undangan Digital</h1>
-<p id="sj"></p><p class="cnt" id="cnt"></p></div>
+<p id="sj"></p><p class="cnt" id="cnt"></p>
+<div class="tabs" id="tabs" role="tablist" aria-label="Jenis undangan"></div></div>
 <div class="g" id="g"></div>
+<div class="empty" id="empty" hidden></div>
 <p class="kosong" id="kosong" hidden>Belum ada model. Tambahkan di assets/js/katalog-data.js</p>
 <script src="assets/js/katalog-data.js"></script>
 <script src="assets/js/form-pesan.js"></script>
@@ -57,11 +78,12 @@ h1{font-size:1.6rem;margin:0 0 4px}.top p{margin:0;opacity:.8}
   document.getElementById('jd').textContent = I.judul || 'Katalog Undangan Digital';
   document.title = I.judul || 'Katalog Undangan Digital';
   document.getElementById('sj').textContent = I.subjudul || '';
-  document.getElementById('cnt').textContent = K.length ? K.length + ' model tersedia' : '';
   if (!K.length) document.getElementById('kosong').hidden = false;
   var IC = {
     eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
     link: '<svg viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>',
+    ring: '<svg viewBox="0 0 24 24"><circle cx="9" cy="15" r="5"/><circle cx="15" cy="15" r="5"/><path d="M12 2.5l1.6 2.3L12 7.2l-1.6-2.4z"/></svg>',
+    moon: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/><path d="M17 3.5l.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8z"/></svg>',
     ok: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
     chat: '<svg viewBox="0 0 24 24"><path d="M12 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6l5 5v2"/><path d="M13 3v5h5"/><path d="M8.5 11.5h4M8.5 15h2.5"/><path d="M22 13l-9 3.5 3.6 1.4 1.4 3.6z"/><path d="M16.6 17.9L22 13"/></svg>'
   };
@@ -79,6 +101,7 @@ h1{font-size:1.6rem;margin:0 0 4px}.top p{margin:0;opacity:.8}
     if (k.cover) { var im = el('img', 'cv'); im.src = k.cover; im.alt = k.nama; im.loading = 'lazy'; pv.appendChild(im); }
     else { var f = el('iframe'); f.src = url; f.loading = 'lazy'; f.tabIndex = -1; f.title = 'Cover ' + k.nama; pv.appendChild(f); }
     var ov = el('a', 'ov'); ov.href = url; ov.target = '_blank'; ov.rel = 'noopener'; ov.setAttribute('aria-label', 'Buka ' + k.nama); pv.appendChild(ov);
+    card.dataset.k = k.kategori === 'khitan' ? 'khitan' : 'pernikahan';
     card.appendChild(pv); card.appendChild(el('b', '', k.nama)); card.appendChild(el('small', '', k.deskripsi || ''));
     var acts = el('div', 'acts');
     var a = el('a', 'ib'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.title = 'Lihat contoh'; a.setAttribute('aria-label', 'Lihat contoh ' + k.nama); a.innerHTML = IC.eye; acts.appendChild(a);
@@ -102,6 +125,45 @@ h1{font-size:1.6rem;margin:0 0 4px}.top p{margin:0;opacity:.8}
       f.style.transform = 'scale(' + (f.parentNode.clientWidth / 390) + ')';
     });
   }
-  window.addEventListener('resize', skala); skala(); setTimeout(skala, 300);
+  window.addEventListener('resize', skala);
+  /* ---- menu jenis undangan ---- */
+  var JENIS = [['pernikahan', 'Pernikahan', 'ring'], ['khitan', 'Khitan', 'moon']], tabs = document.getElementById('tabs'), emp = document.getElementById('empty'), btns = [], ind = el('i', 'ind'), kat = location.hash === '#khitan' ? 'khitan' : 'pernikahan';
+  function jml(j) { return K.filter(function (k) { return (k.kategori === 'khitan' ? 'khitan' : 'pernikahan') === j; }).length; }
+  tabs.appendChild(ind);
+  JENIS.forEach(function (j) {
+    var b = el('button'); b.type = 'button'; b.dataset.k = j[0]; b.setAttribute('role', 'tab'); b.innerHTML = IC[j[2]] + '<span>' + j[1] + '</span><em>' + jml(j[0]) + '</em>';
+    b.onclick = function () { if (kat === j[0]) return; burst(b); tampil(j[0], true); };
+    tabs.appendChild(b); btns.push(b);
+  });
+  function burst(b) {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var r = b.getBoundingClientRect(), t = tabs.getBoundingClientRect(), x = r.left - t.left + r.width / 2, y = r.top - t.top + r.height / 2, cols = ['#d4a373', '#e5989b', '#8B6B58', '#f2cc8f', '#b5838d'];
+    for (var i = 0; i < 14; i++) {
+      var p = el('i', 'spk'), a = Math.PI * 2 * i / 14 + Math.random() * 0.4, d = 40 + Math.random() * 36;
+      p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.background = cols[i % cols.length]; tabs.appendChild(p);
+      p.animate([{transform: 'translate(-50%,-50%) scale(1)', opacity: 1}, {transform: 'translate(calc(-50% + ' + Math.cos(a) * d + 'px),calc(-50% + ' + Math.sin(a) * d + 'px)) scale(0)', opacity: 0}], {duration: 650 + Math.random() * 250, easing: 'cubic-bezier(.2,.8,.3,1)'}).onfinish = (function (n) { return function () { n.remove(); }; })(p);
+    }
+  }
+  function tampil(j, anim) {
+    kat = j; ind.className = 'ind' + (j === 'khitan' ? ' k2' : '');
+    btns.forEach(function (b) { var on = b.dataset.k === j; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+    var vis = [];
+    [].forEach.call(g.children, function (c) { var ok = c.dataset.k === j; c.hidden = !ok; c.classList.remove('in'); if (ok) vis.push(c); });
+    skala();
+    if (anim) vis.forEach(function (c, i) { void c.offsetWidth; c.style.animationDelay = (i * 70) + 'ms'; c.classList.add('in'); });
+    var nama = j === 'khitan' ? 'khitan' : 'pernikahan';
+    document.getElementById('cnt').textContent = vis.length ? vis.length + ' model undangan ' + nama + ' tersedia' : '';
+    emp.hidden = vis.length > 0; emp.style.animation = 'none'; void emp.offsetWidth; emp.style.animation = '';
+    if (!vis.length) {
+      emp.textContent = ''; emp.innerHTML = IC[j === 'khitan' ? 'moon' : 'ring']; emp.appendChild(el('h3', '', 'Model undangan ' + nama + ' segera hadir'));
+      emp.appendChild(el('p', '', 'Anda tetap bisa mengisi data undangan ' + nama + ' sekarang, desainnya kami pilihkan bersama.'));
+      var bt = el('button', 'b', 'Isi data undangan ' + nama); bt.type = 'button';
+      bt.onclick = function () { if (window.PesanForm) window.PesanForm.buka({nama: 'Undangan ' + (j === 'khitan' ? 'Khitan' : 'Pernikahan') + ' (desain dipilih bersama admin)', kategori: j, warna: j === 'khitan' ? '#1F6F6B' : '#8B6B58'}); };
+      emp.appendChild(bt);
+    }
+    try { history.replaceState(null, '', '#' + j); } catch (e) {}
+    setTimeout(skala, 60);
+  }
+  tampil(kat, false); setTimeout(skala, 300);
 })();
 </script></body></html>

@@ -2,7 +2,7 @@
    Daftar isian ada di SECT (bagian bawah baris "var SECT"). Tidak perlu diedit rutin. */
 (function () {
   'use strict';
-  var S = {resepsiOn: true}, P = {cover: null, pria: null, wanita: null, galeri: []}, K, box, bd, ft, ttl, lastZip, lastName;
+  var S = {resepsiOn: true}, P = {cover: null, pria: null, wanita: null, anak: null, galeri: []}, curKat, K, box, bd, ft, ttl, lastZip, lastName;
   var BLN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'], HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
   function el(t, c, x) { var n = document.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; }
   function v(k) { return String(S[k] || '').trim(); }
@@ -11,26 +11,38 @@
   function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'klien'; }
   function lum(h) { var n = parseInt(String(h || '').replace('#', ''), 16); if (isNaN(n)) n = 0x888888; return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255; }
 
-  function ORG(p) { return [['nama','Nama lengkap + gelar'],['panggilan','Nama panggilan'],['ayah','Nama ayah'],['ibu','Nama ibu']].map(function (a) { return {k: p + '.' + a[0], l: a[1], t: 'text', r: 1}; }); }
+  function ORG(p, ln) { return [['nama', ln || 'Nama lengkap + gelar'],['panggilan','Nama panggilan'],['ayah','Nama ayah'],['ibu','Nama ibu']].map(function (a) { return {k: p + '.' + a[0], l: a[1], t: 'text', r: 1}; }); }
   function ACARA(p) { return [['tanggal','Tanggal','date',1],['jam','Jam mulai','time',1],['selesai','Jam selesai (opsional)','time'],['tempat','Nama tempat','text',1],['alamat','Alamat lengkap','area',1],['maps','Link Google Maps (opsional)','url']].map(function (a) { return {k: p + '.' + a[0], l: a[1], t: a[2], r: a[3]}; }); }
-  var SECT = [
+  var SECT_NIKAH = [
     {t: 'Data Pemesan', f: [{k: 'pemesan', l: 'Nama Anda', t: 'text', r: 1}, {k: 'wa', l: 'No. WhatsApp Anda', t: 'tel', r: 1}]},
     {t: 'Mempelai Pria', f: ORG('pria')},
     {t: 'Mempelai Wanita', f: ORG('wanita')},
     {t: 'Akad Nikah', f: ACARA('akad')},
-    {t: 'Resepsi', opt: 'resepsiOn', f: ACARA('resepsi')},
+    {t: 'Resepsi', opt: 'resepsiOn', ol: ' Ada acara resepsi (terpisah dari akad)', f: ACARA('resepsi')},
     {t: 'Turut Mengundang (opsional)', f: [{k: 'turut', l: 'Nama yang turut mengundang (satu nama per baris)', t: 'area', rows: 4, p: 'Contoh:\nKeluarga Besar Bpk. Ahmad\nBpk. H. Slamet & Ibu Siti'}]},
     {t: 'Foto', foto: 1},
     {t: 'Hadiah / Rekening (opsional)', rek: 1},
     {t: 'Tambahan (opsional)', f: [{k: 'musik', l: 'Lagu latar (judul / link)', t: 'text'}, {k: 'catatan', l: 'Catatan untuk kami', t: 'area'}]}
   ];
-  var FOTO = [['cover', 'Foto cover (wajib)', 0], ['pria', 'Foto mempelai pria', 0], ['wanita', 'Foto mempelai wanita', 0], ['galeri', 'Galeri (maks. 8 foto)', 1]];
-  var FNAME = {cover: 'cover.jpg', pria: 'mempelai-pria.jpg', wanita: 'mempelai-wanita.jpg'};
+  function pick(t) { return SECT_NIKAH.filter(function (s) { return s.t.indexOf(t) === 0; })[0]; }
+  var SECT_KHITAN = [
+    pick('Data Pemesan'),
+    {t: 'Putra yang Dikhitan', f: ORG('anak', 'Nama lengkap putra').concat([{k: 'anak.ke', l: 'Putra ke- (opsional)', t: 'text'}])},
+    {t: 'Acara Khitanan', f: ACARA('akad')},
+    {t: 'Syukuran / Resepsi (opsional)', opt: 'resepsiOn', ol: ' Ada acara syukuran / resepsi terpisah', f: ACARA('resepsi')},
+    pick('Turut'), pick('Foto'), pick('Hadiah'), pick('Tambahan')
+  ];
+  function KH() { return !!K && K.kategori === 'khitan'; }
+  function sect() { return KH() ? SECT_KHITAN : SECT_NIKAH; }
+  var FOTO_K = [['cover', 'Foto cover (wajib)', 0], ['anak', 'Foto putra', 0], ['galeri', 'Galeri (maks. 8 foto)', 1]];
+  function fotoList() { return KH() ? FOTO_K : FOTO_N; }
+  var FOTO_N = [['cover', 'Foto cover (wajib)', 0], ['pria', 'Foto mempelai pria', 0], ['wanita', 'Foto mempelai wanita', 0], ['galeri', 'Galeri (maks. 8 foto)', 1]];
+  var FNAME = {cover: 'cover.jpg', pria: 'mempelai-pria.jpg', wanita: 'mempelai-wanita.jpg', anak: 'foto-putra.jpg'};
 
   /* ---------- validasi ---------- */
   function kurang() {
     var m = [];
-    SECT.forEach(function (s) { if (s.opt && !S[s.opt]) return; (s.f || []).forEach(function (f) { if (f.r && !v(f.k)) m.push(f.k); }); });
+    sect().forEach(function (s) { if (s.opt && !S[s.opt]) return; (s.f || []).forEach(function (f) { if (f.r && !v(f.k)) m.push(f.k); }); });
     ['rek1', 'rek2'].forEach(function (p) { if (v(p + '.bank') || v(p + '.no') || v(p + '.an')) { if (!v(p + '.bank')) m.push(p + '.bank'); else { if (v(p + '.bank') === 'Bank lainnya' && !v(p + '.bank2')) m.push(p + '.bank2'); if (lens(p).indexOf(v(p + '.no').length) < 0) m.push(p + '.no'); } if (!v(p + '.an')) m.push(p + '.an'); } });
     var n = v('wa').replace(/\D/g, ''); if (v('wa') && (n.length < 9 || n.length > 15) && m.indexOf('wa') < 0) m.push('wa');
     if (!P.cover) m.push('cover');
@@ -117,11 +129,11 @@
   function viewForm() {
     ttl.textContent = 'Isi Data Undangan - ' + K.nama; bd.textContent = ''; ft.textContent = '';
     bd.appendChild(el('p', 'pn', 'Isi data di bawah. Tanda * wajib diisi. Setelah lengkap, Anda bisa melihat pratinjau sebelum mengirim.'));
-    SECT.forEach(function (s) {
+    sect().forEach(function (s) {
       var c = el('section', 'ps'), h = el('h3', '', s.t); c.appendChild(h);
-      if (s.opt) { var lab = el('label', 'ck'), cb = el('input'); cb.type = 'checkbox'; cb.checked = !!S[s.opt]; lab.appendChild(cb); lab.appendChild(document.createTextNode(' Ada acara resepsi (terpisah dari akad)')); c.appendChild(lab); }
+      if (s.opt) { var lab = el('label', 'ck'), cb = el('input'); cb.type = 'checkbox'; cb.checked = !!S[s.opt]; lab.appendChild(cb); lab.appendChild(document.createTextNode(s.ol)); c.appendChild(lab); }
       var g = el('div', 'pg');
-      if (s.foto) FOTO.forEach(function (a) { g.appendChild(fotoField(a[0], a[1], a[2])); });
+      if (s.foto) fotoList().forEach(function (a) { g.appendChild(fotoField(a[0], a[1], a[2])); });
       else if (s.rek) { g.appendChild(rekBlock('rek1', 'Rekening 1')); g.appendChild(rekBlock('rek2', 'Rekening 2 (opsional)')); }
       else (s.f || []).forEach(function (f) { g.appendChild(field(f)); });
       c.appendChild(g);
@@ -149,10 +161,11 @@
   function viewRingkas() {
     ttl.textContent = 'Data sudah lengkap'; bd.textContent = ''; ft.textContent = '';
     bd.appendChild(el('p', 'pn', 'Periksa ringkasan ini. Klik Preview untuk melihat hasilnya, Edit untuk mengubah data, atau Kirim bila sudah benar.'));
-    var rows = [['Pemesan', v('pemesan') + ' (' + v('wa') + ')'], ['Model', K.nama], ['Mempelai pria', v('pria.nama') + ' (' + v('pria.panggilan') + ')'], ['Mempelai wanita', v('wanita.nama') + ' (' + v('wanita.panggilan') + ')'], ['Akad', tgl(v('akad.tanggal')) + ', ' + jam('akad') + ' - ' + v('akad.tempat')]];
-    if (S.resepsiOn) rows.push(['Resepsi', tgl(v('resepsi.tanggal')) + ', ' + jam('resepsi') + ' - ' + v('resepsi.tempat')]);
+    var rows = [['Pemesan', v('pemesan') + ' (' + v('wa') + ')'], ['Model', K.nama]].concat(KH() ? [['Putra', v('anak.nama') + ' (' + v('anak.panggilan') + ')']] : [['Mempelai pria', v('pria.nama') + ' (' + v('pria.panggilan') + ')'], ['Mempelai wanita', v('wanita.nama') + ' (' + v('wanita.panggilan') + ')']]);
+    rows.push([KH() ? 'Khitanan' : 'Akad', tgl(v('akad.tanggal')) + ', ' + jam('akad') + ' - ' + v('akad.tempat')]);
+    if (S.resepsiOn) rows.push([KH() ? 'Syukuran' : 'Resepsi', tgl(v('resepsi.tanggal')) + ', ' + jam('resepsi') + ' - ' + v('resepsi.tempat')]);
     if (turut().length) rows.push(['Turut mengundang', turut().length + ' nama']);
-    rows.push(['Foto', 1 * !!P.cover + 1 * !!P.pria + 1 * !!P.wanita + P.galeri.length + ' file']);
+    rows.push(['Foto', 1 * !!P.cover + 1 * !!P.pria + 1 * !!P.wanita + 1 * !!P.anak + P.galeri.length + ' file']);
     var c = el('div', 'ps'); rows.forEach(function (r) { var d = el('div', 'rw'); d.appendChild(el('b', '', r[0])); d.appendChild(el('span', '', r[1])); c.appendChild(d); }); bd.appendChild(c);
     var a = el('div', 'acts3');
     a.appendChild(ib('', 'eye', 'Preview', viewPreview)); a.appendChild(ib('', 'edit', 'Edit', viewForm)); a.appendChild(ib('wa', 'send', 'Kirim', kirim));
@@ -166,13 +179,13 @@
     bd.appendChild(el('p', 'pn', 'Pratinjau sederhana dari data & foto Anda dengan warna model ini. Tata letak akhir mengikuti desain ' + K.nama + '.'));
     var iv = el('div', 'iv'); iv.style.setProperty('--a', acc); iv.style.setProperty('--on', on);
     var h = el('div', 'ivh'); if (P.cover) h.style.backgroundImage = 'linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.55)),url(' + P.cover.url + ')';
-    h.appendChild(el('small', '', 'THE WEDDING OF')); h.appendChild(el('h2', '', v('pria.panggilan') + ' & ' + v('wanita.panggilan'))); h.appendChild(el('small', '', tgl(v('akad.tanggal')))); iv.appendChild(h);
-    var cp = el('div', 'ivs');
-    [['pria', 'Putra dari'], ['wanita', 'Putri dari']].forEach(function (a) {
+    h.appendChild(el('small', '', KH() ? 'KHITANAN' : 'THE WEDDING OF')); h.appendChild(el('h2', '', KH() ? v('anak.panggilan') : v('pria.panggilan') + ' & ' + v('wanita.panggilan'))); h.appendChild(el('small', '', tgl(v('akad.tanggal')))); iv.appendChild(h);
+    var cp = el('div', 'ivs'); if (KH()) cp.style.gridTemplateColumns = '1fr';
+    (KH() ? [['anak', 'Putra dari']] : [['pria', 'Putra dari'], ['wanita', 'Putri dari']]).forEach(function (a) {
       var d = el('div', 'cp'); if (P[a[0]]) { var im = el('img'); im.src = P[a[0]].url; d.appendChild(im); }
       d.appendChild(el('b', '', v(a[0] + '.nama'))); d.appendChild(el('small', '', a[1] + ' Bpk. ' + v(a[0] + '.ayah') + ' & Ibu ' + v(a[0] + '.ibu'))); cp.appendChild(d);
     }); iv.appendChild(cp);
-    [['akad', 'Akad Nikah'], ['resepsi', 'Resepsi']].forEach(function (a) {
+    [['akad', KH() ? 'Acara Khitanan' : 'Akad Nikah'], ['resepsi', KH() ? 'Syukuran' : 'Resepsi']].forEach(function (a) {
       if (a[0] === 'resepsi' && !S.resepsiOn) return;
       var d = el('div', 'ev'); d.appendChild(el('h4', '', a[1])); d.appendChild(el('p', '', tgl(v(a[0] + '.tanggal')) + '\n' + jam(a[0]))); d.appendChild(el('b', '', v(a[0] + '.tempat'))); d.appendChild(el('p', '', v(a[0] + '.alamat'))); if (v(a[0] + '.maps')) d.appendChild(el('span', 'mp', 'Lihat Lokasi')); iv.appendChild(d);
     });
@@ -189,11 +202,16 @@
   function dataObj() {
     function org(p) { return {nama: v(p + '.nama'), panggilan: v(p + '.panggilan'), ayah: v(p + '.ayah'), ibu: v(p + '.ibu'), foto: P[p] ? 'foto/' + FNAME[p] : ''}; }
     var rek = []; ['rek1', 'rek2'].forEach(function (p) { if (v(p + '.bank')) rek.push({bank: bn(p), nomor: v(p + '.no'), atasNama: v(p + '.an')}); });
-    return {model: K.nama, pemesan: {nama: v('pemesan'), whatsapp: v('wa')}, cover: P.cover ? 'foto/cover.jpg' : '', mempelai: {pria: org('pria'), wanita: org('wanita')}, akad: acara('akad'), resepsi: S.resepsiOn ? acara('resepsi') : null, galeri: P.galeri.map(function (_, i) { return 'foto/galeri-' + (i + 1) + '.jpg'; }), hadiah: rek, turutMengundang: turut(), musik: v('musik'), catatan: v('catatan')};
+    var o = {model: K.nama, pemesan: {nama: v('pemesan'), whatsapp: v('wa')}, cover: P.cover ? 'foto/cover.jpg' : '', mempelai: {pria: org('pria'), wanita: org('wanita')}, akad: acara('akad'), resepsi: S.resepsiOn ? acara('resepsi') : null, galeri: P.galeri.map(function (_, i) { return 'foto/galeri-' + (i + 1) + '.jpg'; }), hadiah: rek, turutMengundang: turut(), musik: v('musik'), catatan: v('catatan')};
+    if (KH()) { o.kategori = 'khitan'; o.putra = org('anak'); o.putra.putraKe = v('anak.ke'); o.khitan = o.akad; o.syukuran = o.resepsi; delete o.akad; delete o.resepsi; delete o.mempelai; } else o.kategori = 'pernikahan';
+    return o;
   }
   function teks(d) {
-    var L = ['DATA UNDANGAN DIGITAL', 'Model: ' + d.model, 'Pemesan: ' + d.pemesan.nama + ' (' + d.pemesan.whatsapp + ')', '', 'MEMPELAI PRIA', d.mempelai.pria.nama + ' (' + d.mempelai.pria.panggilan + ')', 'Putra dari Bpk. ' + d.mempelai.pria.ayah + ' & Ibu ' + d.mempelai.pria.ibu, '', 'MEMPELAI WANITA', d.mempelai.wanita.nama + ' (' + d.mempelai.wanita.panggilan + ')', 'Putri dari Bpk. ' + d.mempelai.wanita.ayah + ' & Ibu ' + d.mempelai.wanita.ibu];
-    [['AKAD NIKAH', d.akad], ['RESEPSI', d.resepsi]].forEach(function (a) { if (!a[1]) return; L.push('', a[0], a[1].tanggalLengkap + ', ' + a[1].jamMulai + (a[1].jamSelesai ? ' - ' + a[1].jamSelesai : ' - selesai') + ' WIB', a[1].tempat, a[1].alamat); if (a[1].maps) L.push('Maps: ' + a[1].maps); });
+    var kh = KH(), ac = kh ? d.khitan : d.akad, rs = kh ? d.syukuran : d.resepsi, m = d.mempelai;
+    var L = ['DATA UNDANGAN DIGITAL ' + (kh ? 'KHITAN' : 'PERNIKAHAN'), 'Model: ' + d.model, 'Pemesan: ' + d.pemesan.nama + ' (' + d.pemesan.whatsapp + ')', ''];
+    if (kh) L.push('PUTRA YANG DIKHITAN', d.putra.nama + ' (' + d.putra.panggilan + ')', (d.putra.putraKe ? 'Putra ke-' + d.putra.putraKe + ' dari ' : 'Putra dari ') + 'Bpk. ' + d.putra.ayah + ' & Ibu ' + d.putra.ibu);
+    else L.push('MEMPELAI PRIA', m.pria.nama + ' (' + m.pria.panggilan + ')', 'Putra dari Bpk. ' + m.pria.ayah + ' & Ibu ' + m.pria.ibu, '', 'MEMPELAI WANITA', m.wanita.nama + ' (' + m.wanita.panggilan + ')', 'Putri dari Bpk. ' + m.wanita.ayah + ' & Ibu ' + m.wanita.ibu);
+    [[kh ? 'ACARA KHITANAN' : 'AKAD NIKAH', ac], [kh ? 'SYUKURAN' : 'RESEPSI', rs]].forEach(function (a) { if (!a[1]) return; L.push('', a[0], a[1].tanggalLengkap + ', ' + a[1].jamMulai + (a[1].jamSelesai ? ' - ' + a[1].jamSelesai : ' - selesai') + ' WIB', a[1].tempat, a[1].alamat); if (a[1].maps) L.push('Maps: ' + a[1].maps); });
     if (d.turutMengundang.length) { L.push('', 'TURUT MENGUNDANG'); d.turutMengundang.forEach(function (n) { L.push('- ' + n); }); }
     if (d.hadiah.length) { L.push('', 'REKENING HADIAH'); d.hadiah.forEach(function (r) { L.push(r.bank + ' ' + r.nomor + ' a.n. ' + r.atasNama); }); }
     if (d.musik) L.push('', 'LAGU LATAR: ' + d.musik); if (d.catatan) L.push('', 'CATATAN: ' + d.catatan);
@@ -218,16 +236,16 @@
   function unduh() { var a = document.createElement('a'), u = URL.createObjectURL(lastZip); a.href = u; a.download = lastName + '.zip'; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 1000); setTimeout(function () { URL.revokeObjectURL(u); }, 120000); }
   function waLink() {
     var no = String((window.KATALOG_INFO || {}).whatsapp || '').replace(/\D/g, ''); if (no.indexOf('0') === 0) no = '62' + no.slice(1);
-    var t = 'Halo, saya ' + v('pemesan') + ' ingin memesan undangan digital model ' + K.nama + '.\n\nMempelai: ' + v('pria.nama') + ' & ' + v('wanita.nama') + '\nAkad: ' + tgl(v('akad.tanggal')) + ', ' + jam('akad') + (S.resepsiOn ? '\nResepsi: ' + tgl(v('resepsi.tanggal')) + ', ' + jam('resepsi') : '') + '\n\nData & foto saya kirim dalam file ZIP (' + lastName + '.zip) yang saya lampirkan di chat ini.';
+    var t = 'Halo, saya ' + v('pemesan') + ' ingin memesan undangan digital ' + (KH() ? 'khitan' : 'pernikahan') + ' model ' + K.nama + '.\n\n' + (KH() ? 'Putra: ' + v('anak.nama') : 'Mempelai: ' + v('pria.nama') + ' & ' + v('wanita.nama')) + '\n' + (KH() ? 'Khitanan: ' : 'Akad: ') + tgl(v('akad.tanggal')) + ', ' + jam('akad') + (S.resepsiOn ? '\n' + (KH() ? 'Syukuran: ' : 'Resepsi: ') + tgl(v('resepsi.tanggal')) + ', ' + jam('resepsi') : '') + '\n\nData & foto saya kirim dalam file ZIP (' + lastName + '.zip) yang saya lampirkan di chat ini.';
     return 'https://wa.me/' + no + '?text=' + encodeURIComponent(t);
   }
   function kirim() {
     if (BUSY) { alert('Tunggu sebentar, foto masih diproses.'); return; }
-    var d = dataObj(), en = new TextEncoder(), fs = [], root = 'undangan-' + slug(d.mempelai.pria.panggilan) + '-' + slug(d.mempelai.wanita.panggilan);
+    var d = dataObj(), en = new TextEncoder(), fs = [], root = 'undangan-' + (KH() ? 'khitan-' + slug(v('anak.panggilan')) : slug(v('pria.panggilan')) + '-' + slug(v('wanita.panggilan')));
     function add(n, b) { fs.push({name: root + '/' + n, data: b}); }
     add('data/data-undangan.js', en.encode('/* Data undangan (dibuat otomatis dari katalog). Salin ke VS Code; sesuaikan nama properti dengan template bila perlu. */\r\nconst DATA_UNDANGAN = ' + JSON.stringify(d, null, 2) + ';\r\n'));
     add('data/data-klien.txt', en.encode(teks(d)));
-    ['cover', 'pria', 'wanita'].forEach(function (k) { if (P[k]) add('foto/' + FNAME[k], P[k].bytes); });
+    ['cover', 'pria', 'wanita', 'anak'].forEach(function (k) { if (P[k]) add('foto/' + FNAME[k], P[k].bytes); });
     P.galeri.forEach(function (p, i) { add('foto/galeri-' + (i + 1) + '.jpg', p.bytes); });
     lastName = root; lastZip = zip(fs); unduh(); hasil();
   }
@@ -261,7 +279,8 @@
   + '@keyframes pfs{to{background-position:-200% 0}}@keyframes pfr{to{transform:rotate(360deg)}}@keyframes pfp{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}';
   window.PesanForm = {
     buka: function (k) {
-      K = k; if (!document.getElementById('pf-css')) { var s = el('style'); s.id = 'pf-css'; s.textContent = CSS; document.head.appendChild(s); }
+      K = k; var kat = KH() ? 'khitan' : 'pernikahan'; if (kat !== curKat) { S = {resepsiOn: kat !== 'khitan'}; P = {cover: null, pria: null, wanita: null, anak: null, galeri: []}; curKat = kat; }
+      if (!document.getElementById('pf-css')) { var s = el('style'); s.id = 'pf-css'; s.textContent = CSS; document.head.appendChild(s); }
       if (box) box.remove(); box = el('div', 'pm'); var d = el('div', 'pd'), h = el('div', 'ph'), x = el('button', 'px', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Tutup');
       ttl = el('b'); bd = el('div', 'pb0'); ft = el('div', 'pf0'); h.appendChild(ttl); h.appendChild(x); d.appendChild(h); d.appendChild(bd); d.appendChild(ft); box.appendChild(d); document.body.appendChild(box);
       x.onclick = function () { if (confirm('Tutup formulir? Data yang sudah diisi tetap tersimpan selama halaman ini belum ditutup.')) box.hidden = true; };
