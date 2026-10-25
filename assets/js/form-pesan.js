@@ -141,6 +141,7 @@
   var IC = {
     eye: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
     edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>',
+    down: '<svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>',
     send: '<svg viewBox="0 0 24 24"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4 18-7z"/></svg>'
   };
   function ib(cls, ic, txt, fn) { var b = el('button', 'pb ' + cls); b.type = 'button'; b.innerHTML = IC[ic] + '<span></span>'; b.lastChild.textContent = txt; b.onclick = fn; return b; }
@@ -186,56 +187,56 @@
     var rek = []; ['rek1', 'rek2'].forEach(function (p) { if (v(p + '.bank')) rek.push({bank: bn(p), nomor: v(p + '.no'), atasNama: v(p + '.an')}); });
     return {model: K.nama, pemesan: {nama: v('pemesan'), whatsapp: v('wa')}, cover: P.cover ? 'foto/cover.jpg' : '', mempelai: {pria: org('pria'), wanita: org('wanita')}, akad: acara('akad'), resepsi: S.resepsiOn ? acara('resepsi') : null, galeri: P.galeri.map(function (_, i) { return 'foto/galeri-' + (i + 1) + '.jpg'; }), hadiah: rek, musik: v('musik'), catatan: v('catatan')};
   }
-  function jsText(d) { return '/* Data undangan (dibuat otomatis dari katalog). Salin ke VS Code; sesuaikan nama properti dengan template bila perlu. */\r\nconst DATA_UNDANGAN = ' + JSON.stringify(d, null, 2) + ';\r\n'; }
-  function strip(o) {
-    if (Array.isArray(o)) return o.map(strip);
-    if (o && typeof o === 'object') { var r = {}; Object.keys(o).forEach(function (k) { var x = strip(o[k]); if (x === '' || x === null || (Array.isArray(x) && !x.length) || (x && typeof x === 'object' && !Array.isArray(x) && !Object.keys(x).length)) return; r[k] = x; }); return r; }
-    return o;
+  function teks(d) {
+    var L = ['DATA UNDANGAN DIGITAL', 'Model: ' + d.model, 'Pemesan: ' + d.pemesan.nama + ' (' + d.pemesan.whatsapp + ')', '', 'MEMPELAI PRIA', d.mempelai.pria.nama + ' (' + d.mempelai.pria.panggilan + ')', 'Putra dari Bpk. ' + d.mempelai.pria.ayah + ' & Ibu ' + d.mempelai.pria.ibu, '', 'MEMPELAI WANITA', d.mempelai.wanita.nama + ' (' + d.mempelai.wanita.panggilan + ')', 'Putri dari Bpk. ' + d.mempelai.wanita.ayah + ' & Ibu ' + d.mempelai.wanita.ibu];
+    [['AKAD NIKAH', d.akad], ['RESEPSI', d.resepsi]].forEach(function (a) { if (!a[1]) return; L.push('', a[0], a[1].tanggalLengkap + ', ' + a[1].jamMulai + (a[1].jamSelesai ? ' - ' + a[1].jamSelesai : ' - selesai') + ' WIB', a[1].tempat, a[1].alamat); if (a[1].maps) L.push('Maps: ' + a[1].maps); });
+    if (d.hadiah.length) { L.push('', 'REKENING HADIAH'); d.hadiah.forEach(function (r) { L.push(r.bank + ' ' + r.nomor + ' a.n. ' + r.atasNama); }); }
+    if (d.musik) L.push('', 'LAGU LATAR: ' + d.musik); if (d.catatan) L.push('', 'CATATAN: ' + d.catatan);
+    return L.join('\r\n');
   }
-  function pesan() {
-    return 'Halo, saya ' + v('pemesan') + ' ingin memesan undangan digital model ' + K.nama + '.\n\nMempelai: ' + v('pria.nama') + ' & ' + v('wanita.nama') + '\nAkad: ' + tgl(v('akad.tanggal')) + ', ' + jam('akad') + (S.resepsiOn ? '\nResepsi: ' + tgl(v('resepsi.tanggal')) + ', ' + jam('resepsi') : '');
+  var CT = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; CT[n] = c >>> 0; }
+  function crc(b) { var c = -1; for (var i = 0; i < b.length; i++) c = CT[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ -1) >>> 0; }
+  function zip(fs) {
+    var en = new TextEncoder(), out = [], cd = [], off = 0, d = new Date(), dt = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate(), tm = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+    fs.forEach(function (f) {
+      var nm = en.encode(f.name), cr = crc(f.data), sz = f.data.length, h = new DataView(new ArrayBuffer(30)), c = new DataView(new ArrayBuffer(46));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x800, true); h.setUint16(10, tm, true); h.setUint16(12, dt, true); h.setUint32(14, cr, true); h.setUint32(18, sz, true); h.setUint32(22, sz, true); h.setUint16(26, nm.length, true);
+      out.push(new Uint8Array(h.buffer), nm, f.data);
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x800, true); c.setUint16(12, tm, true); c.setUint16(14, dt, true); c.setUint32(16, cr, true); c.setUint32(20, sz, true); c.setUint32(24, sz, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+      cd.push(new Uint8Array(c.buffer), nm); off += 30 + nm.length + sz;
+    });
+    var cs = 0; cd.forEach(function (x) { cs += x.length; });
+    var e = new DataView(new ArrayBuffer(22)); e.setUint32(0, 0x06054b50, true); e.setUint16(8, fs.length, true); e.setUint16(10, fs.length, true); e.setUint32(12, cs, true); e.setUint32(16, off, true);
+    return new Blob(out.concat(cd, [new Uint8Array(e.buffer)]), {type: 'application/zip'});
   }
-  function berkas(d) {
-    var en = new TextEncoder(), fs = []; function f(n, b, t) { fs.push(new File([b], n, {type: t})); }
-    f('data-undangan.txt', en.encode(jsText(d)), 'text/plain');
-    ['cover', 'pria', 'wanita'].forEach(function (k) { if (P[k]) f(FNAME[k], P[k].bytes, 'image/jpeg'); });
-    P.galeri.forEach(function (p, i) { f('galeri-' + (i + 1) + '.jpg', p.bytes, 'image/jpeg'); });
-    return fs;
+  var lastZip, lastName;
+  function unduh() { var a = document.createElement('a'), u = URL.createObjectURL(lastZip); a.href = u; a.download = lastName + '.zip'; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); }, 1000); setTimeout(function () { URL.revokeObjectURL(u); }, 120000); }
+  function waLink() {
+    var no = String((window.KATALOG_INFO || {}).whatsapp || '').replace(/\D/g, ''); if (no.indexOf('0') === 0) no = '62' + no.slice(1);
+    var t = 'Halo, saya ' + v('pemesan') + ' ingin memesan undangan digital model ' + K.nama + '.\n\nMempelai: ' + v('pria.nama') + ' & ' + v('wanita.nama') + '\nAkad: ' + tgl(v('akad.tanggal')) + ', ' + jam('akad') + (S.resepsiOn ? '\nResepsi: ' + tgl(v('resepsi.tanggal')) + ', ' + jam('resepsi') : '') + '\n\nData & foto saya kirim dalam file ZIP (' + lastName + '.zip) yang saya lampirkan di chat ini.';
+    return 'https://wa.me/' + no + '?text=' + encodeURIComponent(t);
   }
-  function noAdmin() { var no = String((window.KATALOG_INFO || {}).whatsapp || '').replace(/\D/g, ''); return no.indexOf('0') === 0 ? '62' + no.slice(1) : no; }
-  function waLink(t) { return 'https://wa.me/' + noAdmin() + '?text=' + encodeURIComponent(t); }
-  function simpan(f) { var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); setTimeout(function () { a.remove(); URL.revokeObjectURL(a.href); }, 1500); }
-  function mobile() { return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
-  var last;
   function kirim() {
     if (BUSY) { alert('Tunggu sebentar, foto masih diproses.'); return; }
-    var d = dataObj(), fs = berkas(d), t = pesan();
-    last = {fs: fs, t: t, d: d};
-    if (mobile() && navigator.canShare && navigator.canShare({files: fs})) {
-      navigator.share({files: fs, text: t + '\n\nData & foto terlampir.', title: 'Data undangan'}).then(function () { hasil('share'); }, function (e) { if (!e || e.name !== 'AbortError') web(); });
-      return;
-    }
-    web();
+    var d = dataObj(), en = new TextEncoder(), fs = [], root = 'undangan-' + slug(d.mempelai.pria.panggilan) + '-' + slug(d.mempelai.wanita.panggilan);
+    function add(n, b) { fs.push({name: root + '/' + n, data: b}); }
+    add('data/data-undangan.js', en.encode('/* Data undangan (dibuat otomatis dari katalog). Salin ke VS Code; sesuaikan nama properti dengan template bila perlu. */\r\nconst DATA_UNDANGAN = ' + JSON.stringify(d, null, 2) + ';\r\n'));
+    add('data/data-klien.txt', en.encode(teks(d)));
+    ['cover', 'pria', 'wanita'].forEach(function (k) { if (P[k]) add('foto/' + FNAME[k], P[k].bytes); });
+    P.galeri.forEach(function (p, i) { add('foto/galeri-' + (i + 1) + '.jpg', p.bytes); });
+    lastName = root; lastZip = zip(fs); unduh(); hasil();
   }
-  function web() {
-    var t = last.t, u = waLink(t + '\n\nData (salin ke VS Code):\n```' + JSON.stringify(strip(last.d)) + '```');
-    if (u.length > 6000) u = waLink(t + '\n\nData lengkap saya kirim sebagai file data-undangan.txt');
-    last.u = u; simpan(last.fs[0]); window.open(u, '_blank'); hasil('web');
-  }
-  function hasil(mode) {
-    ttl.textContent = mode === 'share' ? 'Pilih kontak admin' : 'Lanjutkan di WhatsApp'; bd.textContent = ''; ft.textContent = '';
-    var c = el('div', 'ps'), a = el('div', 'acts3 two');
-    if (mode === 'share') {
-      c.appendChild(el('h3', '', 'Menu bagikan sudah dibuka'));
-      c.appendChild(el('p', 'pn', 'Pilih WhatsApp, lalu pilih kontak admin (+' + noAdmin() + ') dan tekan kirim. Data dan foto Anda ikut terlampir sebagai file, tidak perlu ZIP.'));
-      a.appendChild(ib('', 'send', 'Bagikan lagi', kirim)); a.appendChild(ib('wa', 'send', 'Chat admin', function () { window.open(waLink(last.t), '_blank'); }));
-    } else {
-      c.appendChild(el('h3', '', 'Data sudah masuk ke pesan WhatsApp'));
-      c.appendChild(el('p', 'pn', 'Tekan kirim di WhatsApp. Data undangan sudah ada di dalam pesan. Untuk foto, klik ikon klip di chat lalu pilih foto Anda, atau unduh dulu lewat tombol Unduh foto.'));
-      a.appendChild(ib('', 'send', 'Unduh foto', function () { last.fs.slice(1).forEach(function (f, i) { setTimeout(function () { simpan(f); }, i * 500); }); }));
-      a.appendChild(ib('wa', 'send', 'Buka WhatsApp', function () { window.open(last.u, '_blank'); }));
-    }
-    bd.appendChild(c); ft.appendChild(a);
+  function hasil() {
+    ttl.textContent = 'Kirim ke WhatsApp'; bd.textContent = ''; ft.textContent = '';
+    var mb = (lastZip.size / 1048576).toFixed(1), c = el('div', 'ps');
+    c.appendChild(el('h3', '', 'File ' + lastName + '.zip siap (' + mb + ' MB)'));
+    c.appendChild(el('p', 'pn', 'Isi ZIP: folder foto (semua foto) dan folder data (data-undangan.js & data-klien.txt).'));
+    c.appendChild(el('p', 'pn', 'Langkah 1: ZIP otomatis terunduh. Jika belum, tekan Unduh ZIP.'));
+    c.appendChild(el('p', 'pn', 'Langkah 2: tekan Buka WhatsApp, klik ikon klip / lampiran di chat, pilih file ZIP dari folder Unduhan, lalu kirim.')); bd.appendChild(c);
+    var a = el('div', 'acts3'); a.appendChild(ib('', 'down', 'Unduh ZIP', unduh)); a.appendChild(ib('wa', 'send', 'Buka WhatsApp', function () { window.open(waLink(), '_blank'); }));
+    var zf = window.File ? new File([lastZip], lastName + '.zip', {type: 'application/zip'}) : null;
+    if (zf && navigator.canShare && navigator.canShare({files: [zf]})) a.appendChild(ib('', 'send', 'Bagikan', function () { navigator.share({files: [zf], title: 'Data undangan'}).catch(function () {}); }));
+    ft.appendChild(a);
   }
 
   /* ---------- modal ---------- */
