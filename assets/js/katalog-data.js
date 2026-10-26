@@ -41,6 +41,7 @@ window.KATALOG = [
   { kategori: "pernikahan", nama: "Versi 7 - Airmail Seaside",  deskripsi: "Kartu pos pantai, foto perangko, tepi ombak, pesawat kertas", warna: "#1E6FA8", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-7.html", cover: "" }
   // CONTOH MODEL KHITAN (hapus tanda // di awal baris, lalu ubah isinya; ingat koma di akhir baris sebelumnya):
   // , { kategori: "khitan", nama: "Khitan 1 - Biru Ceria", deskripsi: "Keterangan singkat", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/NAMA-REPO/", cover: "" }
-     , { kategori: "khitan", nama: "Khitan 1 - Biru Ceria", deskripsi: "Keterangan singkat", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/Khitan-Gibran-V1/", cover: "" }
-     , { kategori: "khitan", nama: "Khitan 2 - Hijau Segar", deskripsi: "Keterangan singkat", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/Khitan-Raka-V2/", cover: "" }
+     , { kategori: "khitan", nama: "Khitan 1 - Langit Biru", deskripsi: "balon udara, awan, bintang berkelip", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/Khitan-Gibran-V1/", cover: "" }
+     , { kategori: "khitan", nama: "Khitan 2 - Mahkota Emas", deskripsi: "royal, biru malam + emas, debu emas, sampul membuka seperti tirai", warna: "#191970", demo: "https://ddarkan03-ux.github.io/Khitan-Raka-V2/", cover: "" }
+     , { kategori: "khitan", nama: "Khitan 3 - Lentera Zamrud", deskripsi: "hijau zamrud, lentera berayun, siluet masjid, kartu berbentuk kubah", warna: "#00674F", demo: "https://ddarkan03-ux.github.io/Khitan-V3/", cover: "" }
 ];
