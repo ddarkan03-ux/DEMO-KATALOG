@@ -39,10 +39,14 @@ window.KATALOG = [
   { kategori: "pernikahan", nama: "Versi 5 - Rustic Boho",      deskripsi: "Kertas kraft, foto polaroid bertape, animasi memantul", warna: "#B5603C", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-5.html", cover: "" },
   { kategori: "pernikahan", nama: "Versi 6 - Alam Indah",       deskripsi: "Hijau segar dan matahari, foto bentuk daun, bukit dan kupu-kupu", warna: "#33804E", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-6.html", cover: "" },
   { kategori: "pernikahan", nama: "Versi 7 - Airmail Seaside",  deskripsi: "Kartu pos pantai, foto perangko, tepi ombak, pesawat kertas", warna: "#1E6FA8", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-7.html", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 10 - Sage & Emas",  deskripsi: "", warna: "#1E6FA8", demo: "https://ddarkan03-ux.github.io/Pernikahan-V10/", cover: "" }
+  { kategori: "pernikahan", nama: "Versi 10 - Sage & Emas",  deskripsi: "Suasana: elegan, tenang, dan natural, seperti hutan hijau dengan sentuhan emas. Nuansa hijau tua pekat dan krem hangat membuatnya terasa mewah dan islami.", warna: "#2f4a3c", demo: "https://ddarkan03-ux.github.io/Pernikahan-V10/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 11 - Rose Gold",  deskripsi: "Bernuansa romantis dengan warna blush, wine (merah anggur), dan rose gold. Kesan visualnya hangat dan feminin", warna: "#7b3f4b", demo: "https://ddarkan03-ux.github.io/Pernikahan-V11/", cover: "" }
+  
+  
   // CONTOH MODEL KHITAN (hapus tanda // di awal baris, lalu ubah isinya; ingat koma di akhir baris sebelumnya):
   // , { kategori: "khitan", nama: "Khitan 1 - Biru Ceria", deskripsi: "Keterangan singkat", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/NAMA-REPO/", cover: "" }
      , { kategori: "khitan", nama: "Khitan 1 - Langit Biru", deskripsi: "balon udara, awan, bintang berkelip", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/Khitan-Gibran-V1/", cover: "" }
      , { kategori: "khitan", nama: "Khitan 2 - Mahkota Emas", deskripsi: "royal, biru malam + emas, debu emas, sampul membuka seperti tirai", warna: "#191970", demo: "https://ddarkan03-ux.github.io/Khitan-Raka-V2/", cover: "" }
      , { kategori: "khitan", nama: "Khitan 3 - Lentera Zamrud", deskripsi: "hijau zamrud, lentera berayun, siluet masjid, kartu berbentuk kubah", warna: "#00674F", demo: "https://ddarkan03-ux.github.io/Khitan-V3/", cover: "" }
+     
 ];
