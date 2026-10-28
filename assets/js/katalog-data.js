@@ -34,19 +34,23 @@ window.KATALOG_INFO = {
 window.KATALOG = [
   { kategori: "pernikahan", nama: "Versi 1 - Krem Minimalis",   deskripsi: "Krem dan taupe, foto garis offset, kartu acara dua kolom", warna: "#B9B09F", demo: "https://ddarkan03-ux.github.io/Wedding-Budi-Aap/",              cover: "" },
   { kategori: "pernikahan", nama: "Versi 2 - Emerald & Gold",   deskripsi: "Hijau zaitun dan emas, foto bulat bercincin, kartu terpusat", warna: "#1F3A33", demo: "https://ddarkan03-ux.github.io/Pernikahan-V2/", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 3 - Sakura Blush",     deskripsi: "Pink lembut, kelopak jatuh, foto bentuk organik", warna: "#F8C0CF", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-3.html", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 4 - Midnight Starlight", deskripsi: "Biru malam mewah, bintang berkelip, kartu tiket", warna: "#0B1230", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-4.html", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 5 - Rustic Boho",      deskripsi: "Kertas kraft, foto polaroid bertape, animasi memantul", warna: "#B5603C", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-5.html", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 6 - Alam Indah",       deskripsi: "Hijau segar dan matahari, foto bentuk daun, bukit dan kupu-kupu", warna: "#33804E", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-6.html", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 7 - Airmail Seaside",  deskripsi: "Kartu pos pantai, foto perangko, tepi ombak, pesawat kertas", warna: "#1E6FA8", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-7.html", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 3 - Sakura Blush",     deskripsi: "Pink lembut, kelopak jatuh, foto bentuk organik", warna: "#F8C0CF", demo: "https://ddarkan03-ux.github.io/Pernikahan-V3/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 4 - Midnight Starlight", deskripsi: "Biru malam mewah, bintang berkelip, kartu tiket", warna: "#0B1230", demo: "https://ddarkan03-ux.github.io/Pernikahan-V4/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 5 - Rustic Boho",      deskripsi: "Kertas kraft, foto polaroid bertape, animasi memantul", warna: "#B5603C", demo: "https://ddarkan03-ux.github.io/Pernikahan-V5/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 6 - Alam Indah",       deskripsi: "Hijau segar dan matahari, foto bentuk daun, bukit dan kupu-kupu", warna: "#33804E", demo: "https://ddarkan03-ux.github.io/Pernikahan-V6/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 7 - Airmail Seaside",  deskripsi: "Kartu pos pantai, foto perangko, tepi ombak, pesawat kertas", warna: "#1E6FA8", demo: "https://ddarkan03-ux.github.io/Pernikahan-V7/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 10 - Sage & Emas",  deskripsi: "Suasana: elegan, tenang, dan natural, seperti hutan hijau dengan sentuhan emas. Nuansa hijau tua pekat dan krem hangat membuatnya terasa mewah dan islami.", warna: "#2f4a3c", demo: "https://ddarkan03-ux.github.io/Pernikahan-V10/", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 11 - Rose Gold",  deskripsi: "Bernuansa romantis dengan warna blush, wine (merah anggur), dan rose gold. Kesan visualnya hangat dan feminin", warna: "#7b3f4b", demo: "https://ddarkan03-ux.github.io/Pernikahan-V11/", cover: "" }
+  { kategori: "pernikahan", nama: "Versi 11 - Rose Gold",  deskripsi: "Bernuansa romantis dengan warna blush, wine (merah anggur), dan rose gold. Kesan visualnya hangat dan feminin", warna: "#7b3f4b", demo: "https://ddarkan03-ux.github.io/Pernikahan-V11/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 12 - Hijau Zamrud Emas",  deskripsi: "Hijau teal dan emas lembut, huruf skrip Great Vibes, kartu acara berlatar hijau, bagian bergantian terang dan pucat.", warna: "#0e8579", demo: "https://ddarkan03-ux.github.io/Pernikahan-V12/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 13 - Emerald Sage Classic",  deskripsi: "Hijau tua elegan, sentuhan sage, foto bentuk melengkung", warna: "#1E352B", demo: "https://ddarkan03-ux.github.io/Pernikahan-V13/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 14 - Biru Malam Emas",  deskripsi: "Biru malam dan emas, huruf Pinyon Script dan Cinzel, tampilan gelap dengan animasi muncul halus, kesan mewah dan formal.", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V14/", cover: "" }
+  
   
   
   // CONTOH MODEL KHITAN (hapus tanda // di awal baris, lalu ubah isinya; ingat koma di akhir baris sebelumnya):
   // , { kategori: "khitan", nama: "Khitan 1 - Biru Ceria", deskripsi: "Keterangan singkat", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/NAMA-REPO/", cover: "" }
-     , { kategori: "khitan", nama: "Khitan 1 - Langit Biru", deskripsi: "balon udara, awan, bintang berkelip", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/Khitan-Gibran-V1/", cover: "" }
-     , { kategori: "khitan", nama: "Khitan 2 - Mahkota Emas", deskripsi: "royal, biru malam + emas, debu emas, sampul membuka seperti tirai", warna: "#191970", demo: "https://ddarkan03-ux.github.io/Khitan-Raka-V2/", cover: "" }
+     , { kategori: "khitan", nama: "Khitan 1 - Langit Biru", deskripsi: "balon udara, awan, bintang berkelip", warna: "#2B6CB0", demo: "https://ddarkan03-ux.github.io/Khitan-Gibran-V1/", cover: "" },
+     , { kategori: "khitan", nama: "Khitan 2 - Mahkota Emas", deskripsi: "royal, biru malam + emas, debu emas, sampul membuka seperti tirai", warna: "#191970", demo: "https://ddarkan03-ux.github.io/Khitan-Raka-V2/", cover: "" },
      , { kategori: "khitan", nama: "Khitan 3 - Lentera Zamrud", deskripsi: "hijau zamrud, lentera berayun, siluet masjid, kartu berbentuk kubah", warna: "#00674F", demo: "https://ddarkan03-ux.github.io/Khitan-V3/", cover: "" }
      
 ];
