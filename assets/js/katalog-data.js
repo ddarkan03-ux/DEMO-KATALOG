@@ -33,7 +33,7 @@ window.KATALOG_INFO = {
 
 window.KATALOG = [
   { kategori: "pernikahan", nama: "Versi 1 - Krem Minimalis",   deskripsi: "Krem dan taupe, foto garis offset, kartu acara dua kolom", warna: "#B9B09F", demo: "https://ddarkan03-ux.github.io/Wedding-Budi-Aap/",              cover: "" },
-  { kategori: "pernikahan", nama: "Versi 2 - Emerald & Gold",   deskripsi: "Hijau zaitun dan emas, foto bulat bercincin, kartu terpusat", warna: "#1F3A33", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-2.html", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 2 - Emerald & Gold",   deskripsi: "Hijau zaitun dan emas, foto bulat bercincin, kartu terpusat", warna: "#1F3A33", demo: "https://ddarkan03-ux.github.io/Pernikahan-V2/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 3 - Sakura Blush",     deskripsi: "Pink lembut, kelopak jatuh, foto bentuk organik", warna: "#F8C0CF", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-3.html", cover: "" },
   { kategori: "pernikahan", nama: "Versi 4 - Midnight Starlight", deskripsi: "Biru malam mewah, bintang berkelip, kartu tiket", warna: "#0B1230", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-4.html", cover: "" },
   { kategori: "pernikahan", nama: "Versi 5 - Rustic Boho",      deskripsi: "Kertas kraft, foto polaroid bertape, animasi memantul", warna: "#B5603C", demo: "https://ddarkan03-ux.github.io/undangan-katalog-darkan/versi-5.html", cover: "" },
