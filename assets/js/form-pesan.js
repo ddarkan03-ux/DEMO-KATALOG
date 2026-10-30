@@ -70,7 +70,7 @@
       th.textContent = '';
       items().forEach(function (p, i) {
         var t = el('div', 'tm pop'), im = el('img'), x = el('button', 'tx', '×'); im.src = p.url; x.type = 'button'; x.title = 'Hapus';
-        x.onclick = function () { if (multi) P.galeri.splice(i, 1); else P[key] = null; draw(); };
+        x.onclick = function () { if (multi) P.galeri.splice(i, 1); else P[key] = null; draw(); simpanFoto(); };
         t.appendChild(im); t.appendChild(x); th.appendChild(t);
       });
       for (var j = 0; j < pend; j++) { var l = el('div', 'tm ld'); l.appendChild(el('i', 'sp')); th.appendChild(l); }
@@ -88,7 +88,7 @@
         proses(f, function (r) {
           pend--; BUSY--; dn++;
           if (r) { if (multi) P.galeri.push(r); else P[key] = r; w.classList.remove('err'); }
-          draw(); stat();
+          draw(); stat(); if (r) simpanFoto();
         });
       });
     };
@@ -124,11 +124,79 @@
     w.id = 'f-' + f.k.replace('.', '-'); if (f.t !== 'area') i.type = f.t; else i.rows = f.rows || 2; if (f.p) i.placeholder = f.p;
     if (f.t === 'tel') i.inputMode = 'tel'; i.value = S[f.k] || '';
     i.oninput = function () { S[f.k] = i.value; w.classList.remove('err'); };
-    w.appendChild(lb); w.appendChild(i); return w;
+    w.appendChild(lb); w.appendChild(i); if (/\.maps$/.test(f.k)) petaTools(w, i, f); return w;
+  }
+  /* Link Google Maps otomatis tanpa keluar dari formulir:
+     cari dari nama tempat + alamat, pilih titik di peta (OpenStreetMap), atau pakai lokasi perangkat. */
+  function loadLeaflet(ok, gagal) {
+    if (window.L && L.map) return ok();
+    if (!document.getElementById('lf-css')) { var l = document.createElement('link'); l.id = 'lf-css'; l.rel = 'stylesheet'; l.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'; document.head.appendChild(l); }
+    var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'; sc.onload = ok; sc.onerror = gagal; document.head.appendChild(sc);
+  }
+  function petaTools(w, i, f) {
+    var p = f.k.split('.')[0], last = '', bar = el('div', 'mt'), st = el('small', 'hn'), pv = el('div', 'pvw'), mk = function (t) { var b = el('button', 'pbtn', t); b.type = 'button'; return b; },
+      b1 = mk('Cari link otomatis'), b4 = mk('Pilih di peta'), b2 = mk('Pakai lokasi saya'), b3 = mk('Lihat di Google'), pk = el('div', 'pk'), tp = el('details', 'tp');
+    pv.hidden = true; pk.hidden = true;
+    function nama() { return [v(p + '.tempat'), v(p + '.alamat')].filter(Boolean).join(', '); }
+    function q() { return last || nama(); }
+    function isi(query, pesan) { last = query; var u = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query); i.value = u; S[f.k] = u; w.classList.remove('err'); st.textContent = pesan; st.className = 'hn ok'; simpanDraft(); if (!pv.hidden) peta(); }
+    function info(t) { st.textContent = t; st.className = 'hn'; }
+    function peta() {
+      var t = q(); if (!t) { info('Isi nama tempat dan alamat lengkap dulu.'); pv.hidden = true; return; }
+      pv.textContent = ''; var fr = el('iframe'); fr.title = 'Pratinjau lokasi'; fr.loading = 'lazy'; fr.referrerPolicy = 'no-referrer'; fr.src = 'https://maps.google.com/maps?q=' + encodeURIComponent(t) + '&output=embed';
+      pv.appendChild(fr); pv.appendChild(el('small', 'hn', 'Jika peta tidak tampil, link tetap sah dan bisa dicek setelah undangan jadi.')); pv.hidden = false;
+    }
+    /* peta pilih titik */
+    var row = el('div', 'pkr'), inp = el('input'), go = mk('Cari'), res = el('div', 'pkl'), mp = el('div', 'pkm'), map = null, pin = null;
+    inp.type = 'search'; inp.placeholder = 'Cari nama tempat atau alamat'; row.appendChild(inp); row.appendChild(go); pk.appendChild(row); pk.appendChild(res); pk.appendChild(mp);
+    pk.appendChild(el('small', 'hn', 'Ketuk peta atau geser pin ke titik yang tepat. Peta: OpenStreetMap.'));
+    function set(lat, lng, pesan) {
+      if (!pin) {
+        pin = L.marker([lat, lng], { draggable: true, icon: L.divIcon({ className: 'pin', html: '<i></i>', iconSize: [30, 30], iconAnchor: [15, 30] }) }).addTo(map);
+        pin.on('dragend', function () { var c = pin.getLatLng(); isi(c.lat.toFixed(6) + ',' + c.lng.toFixed(6), 'Titik dipilih dari peta.'); });
+      } else pin.setLatLng([lat, lng]);
+      map.setView([lat, lng], Math.max(map.getZoom(), 17)); isi(lat.toFixed(6) + ',' + lng.toFixed(6), pesan || 'Titik dipilih dari peta.');
+    }
+    function cari() {
+      var t = inp.value.trim(); if (!t) return; res.textContent = 'Mencari...';
+      fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=id&accept-language=id&q=' + encodeURIComponent(t)).then(function (r) { return r.json(); }).then(function (list) {
+        res.textContent = ''; if (!list.length) { res.textContent = 'Tidak ditemukan. Coba nama jalan atau kelurahan saja, atau ketuk peta untuk menandai titiknya sendiri.'; return; }
+        list.forEach(function (x) { var b = el('button', 'pkb', x.display_name); b.type = 'button'; b.onclick = function () { res.textContent = ''; set(+x.lat, +x.lon, 'Lokasi dipilih: ' + x.display_name.split(',')[0] + '. Geser pin bila perlu.'); }; res.appendChild(b); });
+      }).catch(function () { res.textContent = 'Pencarian tidak bisa dijangkau. Ketuk peta untuk menandai titik secara manual.'; });
+    }
+    go.onclick = cari; inp.onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); cari(); } };
+    function buka() {
+      pk.hidden = false; if (!inp.value) inp.value = nama(); res.textContent = 'Memuat peta...';
+      loadLeaflet(function () {
+        res.textContent = '';
+        if (!map) {
+          map = L.map(mp).setView([-2.5, 118], 5); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+          map.on('click', function (e) { set(e.latlng.lat, e.latlng.lng); });
+          var m = /query=(-?\d+\.\d+)(?:%2C|,)(-?\d+\.\d+)/.exec(i.value);
+          if (m) set(+m[1], +m[2], 'Titik yang sudah dipilih dimuat. Geser pin bila perlu.'); else if (inp.value) cari();
+        }
+        setTimeout(function () { map.invalidateSize(); }, 60);
+      }, function () { res.textContent = 'Peta tidak bisa dimuat. Periksa koneksi internet, atau gunakan "Cari link otomatis".'; });
+    }
+    b1.onclick = function () { var t = nama(); if (!t) { info('Isi nama tempat dan alamat lengkap dulu, lalu klik lagi.'); return; } isi(t, 'Link dibuat dari nama tempat dan alamat. Klik "Pilih di peta" untuk memastikan titiknya.'); };
+    b4.onclick = function () { if (pk.hidden) buka(); else pk.hidden = true; };
+    b2.onclick = function () {
+      if (!navigator.geolocation) { info('Perangkat ini tidak mendukung lokasi.'); return; }
+      info('Mencari lokasi Anda...'); b2.disabled = true;
+      navigator.geolocation.getCurrentPosition(function (r) { b2.disabled = false; isi(r.coords.latitude.toFixed(6) + ',' + r.coords.longitude.toFixed(6), 'Lokasi Anda dipakai (akurasi sekitar ' + Math.round(r.coords.accuracy) + ' m). Pastikan Anda sedang berada di lokasi acara.'); },
+        function () { b2.disabled = false; info('Izin lokasi ditolak atau lokasi tidak ditemukan. Gunakan "Pilih di peta".'); }, { enableHighAccuracy: true, timeout: 12000 });
+    };
+    b3.onclick = function () { if (pv.hidden) peta(); else pv.hidden = true; };
+    i.addEventListener('input', function () { last = ''; });
+    tp.appendChild(el('summary', '', 'Tidak tahu lokasinya atau tidak sedang di tempat acara?'));
+    tp.appendChild(el('p', '', 'Tidak perlu keluar dari halaman ini. Klik "Pilih di peta", ketik nama tempat atau kelurahan, ketuk hasilnya, lalu geser pin ke titik yang tepat. Rumah tanpa nama: dekatkan peta ke gangnya lalu ketuk titiknya. Kolom ini boleh dikosongkan.'));
+    bar.appendChild(b1); bar.appendChild(b4); bar.appendChild(b2); bar.appendChild(b3); w.appendChild(bar); w.appendChild(st); w.appendChild(pk); w.appendChild(pv); w.appendChild(tp);
   }
   function viewForm() {
     ttl.textContent = 'Isi Data Undangan - ' + K.nama; bd.textContent = ''; ft.textContent = '';
     bd.appendChild(el('p', 'pn', 'Isi data di bawah. Tanda * wajib diisi. Setelah lengkap, Anda bisa melihat pratinjau sebelum mengirim.'));
+    if (dipulihkan) { var bn = el('div', 'rst'), rb = el('button', 'pbtn', 'Mulai dari awal'); rb.type = 'button'; bn.appendChild(el('span', '', 'Data yang Anda isi sebelumnya dipulihkan. Anda bisa melanjutkan.'));
+      rb.onclick = function () { if (confirm('Hapus semua data tersimpan dan mulai dari awal?')) { hapusDraft(); S = {resepsiOn: !KH()}; P = freshP(); dipulihkan = false; viewForm(); } }; bn.appendChild(rb); bd.appendChild(bn); }
     sect().forEach(function (s) {
       var c = el('section', 'ps'), h = el('h3', '', s.t); c.appendChild(h);
       if (s.opt) { var lab = el('label', 'ck'), cb = el('input'); cb.type = 'checkbox'; cb.checked = !!S[s.opt]; lab.appendChild(cb); lab.appendChild(document.createTextNode(s.ol)); c.appendChild(lab); }
@@ -257,6 +325,7 @@
     c.appendChild(el('p', 'pn', 'Langkah 1: ZIP otomatis terunduh. Jika belum, tekan Unduh ZIP.'));
     c.appendChild(el('p', 'pn', 'Langkah 2: tekan Buka WhatsApp, klik ikon klip / lampiran di chat, pilih file ZIP dari folder Unduhan, lalu kirim.')); bd.appendChild(c);
     var a = el('div', 'acts3'); a.appendChild(ib('', 'down', 'Unduh ZIP', unduh)); a.appendChild(ib('wa', 'send', 'Buka WhatsApp', function () { window.open(waLink(), '_blank'); }));
+    var hp = el('button', 'pbtn', 'Hapus data tersimpan di perangkat ini'); hp.type = 'button'; hp.onclick = function () { hapusDraft(); hp.textContent = 'Data tersimpan sudah dihapus'; hp.disabled = true; }; c.appendChild(hp);
     ft.appendChild(a);
   }
 
@@ -276,15 +345,55 @@
   + '.pf select{width:100%;padding:10px;border:1px solid #ddd5cc;border-radius:10px;font:inherit;background:#fff}.pf.err select{border-color:#d6336c}.rk{background:#fff;border:1px solid #eee;border-radius:12px;padding:10px;margin-bottom:10px;display:grid;gap:8px}.hn{display:block;margin-top:3px;font-size:.75rem;color:#999}.hn.ok{color:#1f9d55;font-weight:600}'
   + '.st{margin-top:8px;font-size:.78rem;color:#8B6B58}.st.ok{color:#1f9d55;font-weight:600}.bar{height:6px;background:#eee;border-radius:99px;overflow:hidden;margin-top:4px}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8B6B58,#e0bfa8,#8B6B58);background-size:200% 100%;animation:pfs 1s linear infinite;transition:width .3s}.st.ok .bar i{background:#1f9d55;animation:none}'
   + '.tm.ld{background:linear-gradient(90deg,#f1ece6,#fff,#f1ece6);background-size:200% 100%;animation:pfs 1.2s linear infinite;border-radius:10px;display:flex;align-items:center;justify-content:center}.sp{width:22px;height:22px;border:3px solid #e7ddd3;border-top-color:#8B6B58;border-radius:50%;animation:pfr .7s linear infinite}.pop{animation:pfp .35s ease}'
-  + '@keyframes pfs{to{background-position:-200% 0}}@keyframes pfr{to{transform:rotate(360deg)}}@keyframes pfp{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}';
+  + '@keyframes pfs{to{background-position:-200% 0}}@keyframes pfr{to{transform:rotate(360deg)}}@keyframes pfp{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}'
+  + '.mt{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.mt .pbtn{background:#fff;font:inherit;font-size:.8rem;border-style:solid;padding:7px 13px;border-radius:99px}.mt .pbtn:disabled{opacity:.5}.pvw{margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid #ddd5cc;background:#faf8f5}.pvw iframe{width:100%;height:220px;border:0;display:block}.pvw .hn{padding:4px 10px 8px}'
+  + '.pk{margin-top:8px;border:1px solid #ddd5cc;border-radius:12px;padding:8px;background:#faf8f5}.pkr{display:flex;gap:6px}.pkr input{flex:1;min-width:0}.pkr .pbtn{background:#8B6B58;color:#fff;border-style:solid;padding:8px 14px;border-radius:10px}.pkl{display:grid;gap:4px;margin:6px 0;font-size:.78rem}.pkb{text-align:left;border:1px solid #ddd5cc;background:#fff;border-radius:8px;padding:6px 8px;font:inherit;font-size:.78rem;cursor:pointer}.pkm{position:relative;z-index:0;height:260px;border-radius:10px;overflow:hidden;margin-top:6px}.pin i{display:block;width:26px;height:26px;margin:2px;background:#d6336c;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 6px rgba(0,0,0,.4);border:3px solid #fff}'
+  + '.tp{margin-top:8px;font-size:.78rem;color:#6b5a4e}.tp summary{cursor:pointer;color:#8B6B58;font-weight:600}.tp p{margin:6px 0 0;line-height:1.5}'
+  + '.rst{display:flex;gap:8px;align-items:center;justify-content:space-between;background:#E3F4EA;color:#1f7a45;border-radius:10px;padding:8px 10px;margin-bottom:10px;font-size:.82rem}.rst .pbtn{background:#fff;padding:5px 10px;font-size:.75rem;border-style:solid;color:#1f7a45;border-color:#1f7a45;flex:none}'
+  + '.lj{position:fixed;left:50%;bottom:16px;translate:-50% 0;z-index:90;display:flex;background:#8B6B58;border-radius:99px;box-shadow:0 6px 18px rgba(0,0,0,.3);overflow:hidden}.ljg,.ljx{border:0;background:transparent;color:#fff;font:600 .85rem system-ui,sans-serif;padding:11px 14px;cursor:pointer}.ljx{border-left:1px solid rgba(255,255,255,.35);font-size:1.1rem;padding:8px 14px}';
+  /* ---------- simpan otomatis: data tidak hilang walau halaman dimuat ulang atau klien berpindah aplikasi ---------- */
+  var dipulihkan = false, tmD, DBP;
+  function freshP() { return {cover: null, pria: null, wanita: null, anak: null, galeri: []}; }
+  function idb() { return DBP || (DBP = new Promise(function (ok, no) { var r = indexedDB.open('pf-draft', 1); r.onupgradeneeded = function () { r.result.createObjectStore('f'); }; r.onsuccess = function () { ok(r.result); }; r.onerror = function () { no(r.error); }; })); }
+  function dbSet(k, val) { return idb().then(function (db) { return new Promise(function (ok) { var t = db.transaction('f', 'readwrite'); t.objectStore('f').put(val, k); t.oncomplete = ok; t.onerror = ok; }); }).catch(function () {}); }
+  function dbGet(k) { return idb().then(function (db) { return new Promise(function (ok) { var r = db.transaction('f').objectStore('f').get(k); r.onsuccess = function () { ok(r.result); }; r.onerror = function () { ok(); }; }); }).catch(function () {}); }
+  function dbDel(k) { return idb().then(function (db) { return new Promise(function (ok) { var t = db.transaction('f', 'readwrite'); t.objectStore('f').delete(k); t.oncomplete = ok; t.onerror = ok; }); }).catch(function () {}); }
+  function adaIsi() { return Object.keys(S).some(function (k) { return k !== 'resepsiOn' && String(S[k]).trim(); }) || P.cover || P.pria || P.wanita || P.anak || P.galeri.length; }
+  function simpanDraft() {
+    clearTimeout(tmD); tmD = setTimeout(function () {
+      try { if (!adaIsi()) { localStorage.removeItem('pf-draft'); return; } localStorage.setItem('pf-draft', JSON.stringify({kat: curKat, K: {nama: K.nama, kategori: K.kategori || 'pernikahan', warna: K.warna || ''}, S: S, ts: Date.now()})); } catch (x) {}
+    }, 400);
+  }
+  function simpanFoto() { dbSet('draft', {cover: P.cover && P.cover.bytes, pria: P.pria && P.pria.bytes, wanita: P.wanita && P.wanita.bytes, anak: P.anak && P.anak.bytes, galeri: P.galeri.map(function (g) { return g.bytes; })}); simpanDraft(); }
+  function hapusDraft() { try { localStorage.removeItem('pf-draft'); } catch (x) {} dbDel('draft'); }
+  function bacaDraft() { try { var d = JSON.parse(localStorage.getItem('pf-draft') || 'null'); return d && d.K && Date.now() - d.ts < 7 * 864e5 ? d : null; } catch (x) { return null; } }
+  function muatDraft(kat) {
+    var d = bacaDraft(); if (!d || d.kat !== kat) return Promise.resolve();
+    S = Object.assign({resepsiOn: kat !== 'khitan'}, d.S); dipulihkan = true;
+    return dbGet('draft').then(function (o) {
+      if (!o) return; var mkp = function (b) { return b ? {bytes: b, url: URL.createObjectURL(new Blob([b], {type: 'image/jpeg'}))} : null; };
+      P.cover = mkp(o.cover); P.pria = mkp(o.pria); P.wanita = mkp(o.wanita); P.anak = mkp(o.anak); P.galeri = (o.galeri || []).map(mkp).filter(Boolean);
+    });
+  }
+  function cssAda() { if (!document.getElementById('pf-css')) { var st = el('style'); st.id = 'pf-css'; st.textContent = CSS; document.head.appendChild(st); } }
+  function pil() {
+    var d = bacaDraft(); if (!d || document.getElementById('pf-lj')) return; cssAda();
+    var w = el('div', 'lj'), g = el('button', 'ljg', 'Lanjutkan isi data: ' + d.K.nama), x = el('button', 'ljx', '×'); w.id = 'pf-lj'; g.type = x.type = 'button'; x.title = 'Hapus data tersimpan'; x.setAttribute('aria-label', 'Hapus data tersimpan');
+    g.onclick = function () { w.remove(); window.PesanForm.buka(d.K); };
+    x.onclick = function () { if (confirm('Hapus data yang tersimpan di perangkat ini?')) { hapusDraft(); w.remove(); } };
+    w.appendChild(g); w.appendChild(x); document.body.appendChild(w);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pil); else setTimeout(pil, 0);
+
   window.PesanForm = {
     buka: function (k) {
-      K = k; var kat = KH() ? 'khitan' : 'pernikahan'; if (kat !== curKat) { S = {resepsiOn: kat !== 'khitan'}; P = {cover: null, pria: null, wanita: null, anak: null, galeri: []}; curKat = kat; }
-      if (!document.getElementById('pf-css')) { var s = el('style'); s.id = 'pf-css'; s.textContent = CSS; document.head.appendChild(s); }
+      K = k; var kat = KH() ? 'khitan' : 'pernikahan', baru = false; if (kat !== curKat) { S = {resepsiOn: kat !== 'khitan'}; P = freshP(); curKat = kat; dipulihkan = false; baru = true; }
+      cssAda(); var lj = document.getElementById('pf-lj'); if (lj) lj.remove();
       if (box) box.remove(); box = el('div', 'pm'); var d = el('div', 'pd'), h = el('div', 'ph'), x = el('button', 'px', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Tutup');
       ttl = el('b'); bd = el('div', 'pb0'); ft = el('div', 'pf0'); h.appendChild(ttl); h.appendChild(x); d.appendChild(h); d.appendChild(bd); d.appendChild(ft); box.appendChild(d); document.body.appendChild(box);
       x.onclick = function () { if (confirm('Tutup formulir? Data yang sudah diisi tetap tersimpan selama halaman ini belum ditutup.')) box.hidden = true; };
-      box.hidden = false; viewForm();
+      bd.addEventListener('input', simpanDraft); bd.addEventListener('change', simpanDraft);
+      if (baru) { box.hidden = false; bd.textContent = 'Memuat...'; muatDraft(kat).then(viewForm); } else { box.hidden = false; viewForm(); }
     }
   };
 })();
