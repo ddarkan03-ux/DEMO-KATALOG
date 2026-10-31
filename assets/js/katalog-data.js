@@ -48,7 +48,11 @@ window.KATALOG = [
   { kategori: "pernikahan", nama: "Versi 14 - Biru Malam Emas",  deskripsi: "Biru malam dan emas, huruf Pinyon Script dan Cinzel, tampilan gelap dengan animasi muncul halus, kesan mewah dan formal.", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V14/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 15 - Watercolor Hand Drawn",  deskripsi: "Karya seni air color yang dihasilkan secara tangan", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V15/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 16 - Poster Drama Korea",  deskripsi: "Bertema poster drama Korea ala Gen Alpha", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V16/", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 17 - Filem Drama Korea Sinematik",  deskripsi: "Bertema bergaya film drama Korea sinematik ala Gen Z", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V17/", cover: "" }
+  { kategori: "pernikahan", nama: "Versi 17 - Filem Drama Korea Sinematik",  deskripsi: "Bertema bergaya film drama Korea sinematik ala Gen Z", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V17/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 18 - Coming Son",  deskripsi: "", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V18/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 19 - Sage Rose",  deskripsi: "Hijau sage bertekstur plester dengan kartu putih berujung membulat, dan tidak ada lagi aksen emas", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V19/", cover: "" }
+  
+  
   
   
   
