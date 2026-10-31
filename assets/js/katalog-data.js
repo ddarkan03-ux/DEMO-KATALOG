@@ -46,7 +46,10 @@ window.KATALOG = [
   { kategori: "pernikahan", nama: "Versi 12 - Hijau Zamrud Emas",  deskripsi: "Hijau teal dan emas lembut, huruf skrip Great Vibes, kartu acara berlatar hijau, bagian bergantian terang dan pucat.", warna: "#0e8579", demo: "https://ddarkan03-ux.github.io/Pernikahan-V12/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 13 - Emerald Sage Classic",  deskripsi: "Hijau tua elegan, sentuhan sage, foto bentuk melengkung", warna: "#1E352B", demo: "https://ddarkan03-ux.github.io/Pernikahan-V13/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 14 - Biru Malam Emas",  deskripsi: "Biru malam dan emas, huruf Pinyon Script dan Cinzel, tampilan gelap dengan animasi muncul halus, kesan mewah dan formal.", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V14/", cover: "" },
-  { kategori: "pernikahan", nama: "Versi 15 - Watercolor Hand Drawn",  deskripsi: "Karya seni air color yang dihasilkan secara tangan", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V15/", cover: "" }
+  { kategori: "pernikahan", nama: "Versi 15 - Watercolor Hand Drawn",  deskripsi: "Karya seni air color yang dihasilkan secara tangan", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V15/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 16 - Poster Drama Korea",  deskripsi: "Bertema poster drama Korea ala Gen Alpha", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V16/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 17 - Filem Drama Korea Sinematik",  deskripsi: "Bertema bergaya film drama Korea sinematik ala Gen Z", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V17/", cover: "" }
+  
   
   
   // CONTOH MODEL KHITAN (hapus tanda // di awal baris, lalu ubah isinya; ingat koma di akhir baris sebelumnya):
