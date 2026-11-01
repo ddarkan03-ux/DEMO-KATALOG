@@ -51,6 +51,7 @@ window.KATALOG = [
   { kategori: "pernikahan", nama: "Versi 17 - Filem Drama Korea Sinematik",  deskripsi: "Bertema bergaya film drama Korea sinematik ala Gen Z", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V17/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 18 - Taman Sage Emas",  deskripsi: "Undangan pernikahan hijau sage dan emas yang hangat", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V18/", cover: "" },
   { kategori: "pernikahan", nama: "Versi 19 - Sage Rose",  deskripsi: "Hijau sage bertekstur plester dengan kartu putih berujung membulat, dan tidak ada lagi aksen emas", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V19/", cover: "" },
+  { kategori: "pernikahan", nama: "Versi 20 - Sage Rose",  deskripsi: "Hijau sage bertekstur plester dengan kartu putih berujung membulat, dan tidak ada lagi aksen emas", warna: "#10223a", demo: "https://ddarkan03-ux.github.io/Pernikahan-V20/", cover: "" },
   
   
   
